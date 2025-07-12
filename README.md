@@ -30,4 +30,3 @@ This project is a landing page for a bookstore with a shopping cart, built using
 ## Notes
 - Product images are placeholders. Replace them with real images as needed.
 - The backend/API setup will be added in the next steps.
-# landing-page
