@@ -117,9 +117,22 @@ function App() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 700 }}>
+          <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700, mr: 2 }}>
             Librería
           </Typography>
+          <Box sx={{ flexGrow: 1, maxWidth: 350, display: { xs: 'none', sm: 'block' } }}>
+            <Search>
+              <SearchIconWrapper>
+                <span role="img" aria-label="Buscar">🔍</span>
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Buscar libros…"
+                inputProps={{ 'aria-label': 'buscar libros' }}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </Search>
+          </Box>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
             <Button color="inherit">Libros</Button>
             <Button color="inherit">Catálogo</Button>
