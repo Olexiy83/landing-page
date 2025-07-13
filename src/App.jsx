@@ -39,11 +39,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
     width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '30ch',
-    },
+    // Eliminar el cambio de ancho en 'md' para que no se achique
   },
 }));
 
@@ -131,17 +128,7 @@ function App() {
             <Button color="inherit">Locales</Button>
             <Button color="inherit">Contacto</Button>
           </Box>
-          <Search>
-            <SearchIconWrapper>
-              <MenuIcon sx={{ opacity: 0 }} /> {/* Espacio para el icono, invisible */}
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Buscar libro, autor, ISBN, palabra clave..."
-              inputProps={{ 'aria-label': 'search' }}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </Search>
+          {/* Input de búsqueda eliminado */}
           <IconButton color="inherit" sx={{ ml: 2 }}>
             <Favorite />
           </IconButton>
@@ -168,22 +155,8 @@ function App() {
 
       {/* Layout principal */}
       <Grid container spacing={2} sx={{ p: 3 }}>
-        {/* Sidebar de categorías y catálogo juntos */}
         <Grid item xs={12} sm={12} md={12}>
-          <Paper elevation={2} sx={{ p: 2, borderRadius: 3, mb: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Categorías</Typography>
-            <List sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {categories.map((cat) => (
-                <ListItem button key={cat} sx={{ width: 'auto', borderRadius: 2, px: 2 }}>
-                  <ListItemText primary={cat} />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography variant="subtitle1">
-              Mostrando 1–{filteredProducts.length} de {products.length} resultados
-            </Typography>
+          <Box sx={{ mb: 2, width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
             <Select
               value={sortOption}
               onChange={e => setSortOption(e.target.value)}
@@ -196,16 +169,16 @@ function App() {
               <MenuItem value="precio">Ordenar por el precio</MenuItem>
             </Select>
           </Box>
-          <Grid container spacing={2}>
+          <Grid container spacing={2} justifyContent="center" alignItems="center">
             {filteredProducts.map((book) => (
-              <Grid item xs={12} sm={6} md={4} key={book.id}>
-                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 3 }}>
+              <Grid item xs={12} sm={6} md={4} key={book.id} sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 3, alignItems: 'center', textAlign: 'center', minWidth: 260, maxWidth: 320 }}>
                   <CardMedia
                     component="img"
                     height="180"
                     image={book.image}
                     alt={book.title}
-                    sx={{ objectFit: 'contain', p: 1, bgcolor: '#f8f8f8' }}
+                    sx={{ objectFit: 'contain', p: 1, bgcolor: '#f8f8f8', mx: 'auto' }}
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>{book.title}</Typography>
@@ -214,7 +187,7 @@ function App() {
                       ARS ${book.price.toLocaleString('es-AR', {minimumFractionDigits:2})}
                     </Typography>
                   </CardContent>
-                  <CardActions>
+                  <CardActions sx={{ width: '100%' }}>
                     <Button variant="contained" color="primary" fullWidth onClick={() => addToCart(book)}>
                       Agregar al carrito
                     </Button>
@@ -229,8 +202,15 @@ function App() {
 
       {/* Drawer para carrito (mobile) */}
       <Drawer anchor="right" open={cartOpen} onClose={() => setCartOpen(false)}>
-        <Box sx={{ width: 320, p: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Carrito de compras</Typography>
+        <Box sx={{ width: 320, p: 2, position: 'relative' }}>
+          <IconButton
+            aria-label="Cerrar"
+            onClick={() => setCartOpen(false)}
+            sx={{ position: 'absolute', top: 8, right: 8 }}
+          >
+            ×
+          </IconButton>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, pr: 4 }}>Carrito de compras</Typography>
           <Divider sx={{ mb: 2 }} />
           {cart.length === 0 ? (
             <Typography color="text.secondary">El carrito está vacío.</Typography>
