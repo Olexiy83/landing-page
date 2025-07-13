@@ -8,6 +8,7 @@ import './App.css';
 function App() {
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
+  const [sortOption, setSortOption] = useState('popularidad');
 
   const addToCart = (product) => {
     setCart((prev) => {
@@ -25,9 +26,18 @@ function App() {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const filteredProducts = products.filter(
+  let filteredProducts = products.filter(
     (p) => p.title.toLowerCase().includes(search.toLowerCase())
   );
+
+  // Ordenar según la opción seleccionada
+  if (sortOption === 'nombre') {
+    filteredProducts = [...filteredProducts].sort((a, b) => a.title.localeCompare(b.title));
+  } else if (sortOption === 'autor') {
+    filteredProducts = [...filteredProducts].sort((a, b) => a.author.localeCompare(b.author));
+  } else if (sortOption === 'precio') {
+    filteredProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
+  }
 
   return (
     <div className="cus-root">
@@ -87,8 +97,11 @@ function App() {
         <main className="cus-catalog">
           <div className="cus-results-bar">
             Mostrando 1–{filteredProducts.length} de {products.length} resultados
-            <select className="cus-sort">
-              <option>Ordenar por popularidad</option>
+            <select className="cus-sort" value={sortOption} onChange={e => setSortOption(e.target.value)}>
+              <option value="popularidad">Ordenar por popularidad</option>
+              <option value="nombre">Ordenar por nombre</option>
+              <option value="autor">Ordenar por autor</option>
+              <option value="precio">Ordenar por el precio</option>
             </select>
           </div>
           <div className="cus-product-grid">
