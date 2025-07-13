@@ -5,7 +5,7 @@ export const products = [
     title: 'El Quijote',
     author: 'Miguel de Cervantes',
     price: 19990,
-    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/1.jpg',
     featured: true
   },
   {
@@ -13,7 +13,7 @@ export const products = [
     title: 'Cien Años de Soledad',
     author: 'Gabriel García Márquez',
     price: 24990,
-    image: 'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/2.jpg',
     featured: true
   },
   {
@@ -21,7 +21,7 @@ export const products = [
     title: 'Rayuela',
     author: 'Julio Cortázar',
     price: 17500,
-    image: 'https://images.unsplash.com/photo-1463320898484-cdee8141c787?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/3.jpg',
     featured: false
   },
   {
@@ -29,7 +29,7 @@ export const products = [
     title: 'La sombra del viento',
     author: 'Carlos Ruiz Zafón',
     price: 18990,
-    image: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/4.jpg',
     featured: false
   },
   {
@@ -37,7 +37,7 @@ export const products = [
     title: 'Ficciones',
     author: 'Jorge Luis Borges',
     price: 21500,
-    image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/5.jpg',
     featured: false
   },
   {
@@ -45,7 +45,7 @@ export const products = [
     title: 'Donde los árboles cantan',
     author: 'Laura Gallego',
     price: 16750,
-    image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/6.jpg',
     featured: false
   },
   {
@@ -53,7 +53,7 @@ export const products = [
     title: 'Los detectives salvajes',
     author: 'Roberto Bolaño',
     price: 22000,
-    image: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/7.jpg',
     featured: false
   },
   {
@@ -61,7 +61,7 @@ export const products = [
     title: 'Como agua para chocolate',
     author: 'Laura Esquivel',
     price: 14990,
-    image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/8.jpg',
     featured: false
   },
   {
@@ -69,7 +69,7 @@ export const products = [
     title: 'La casa de los espíritus',
     author: 'Isabel Allende',
     price: 20990,
-    image: 'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/9.jpg',
     featured: false
   },
   {
@@ -77,7 +77,7 @@ export const products = [
     title: 'Aura',
     author: 'Carlos Fuentes',
     price: 13500,
-    image: 'https://images.unsplash.com/photo-1466354424719-343280fe118b?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/10.jpg',
     featured: false
   },
   {
@@ -85,7 +85,7 @@ export const products = [
     title: 'Sobre héroes y tumbas',
     author: 'Ernesto Sabato',
     price: 18250,
-    image: 'https://images.unsplash.com/photo-1463320898484-cdee8141c787?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/12.jpg',
     featured: false
   },
   {
@@ -93,7 +93,7 @@ export const products = [
     title: 'El Aleph',
     author: 'Jorge Luis Borges',
     price: 19500,
-    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/13.jpg',
     featured: false
 
   },
@@ -102,7 +102,7 @@ export const products = [
     title: 'Pedro Páramo',
     author: 'Juan Rulfo',
     price: 15990,
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/14.jpg',
     featured: false
   },
   {
@@ -110,7 +110,7 @@ export const products = [
     title: 'La tregua',
     author: 'Mario Benedetti',
     price: 17990,
-    image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/15.jpg',
     featured: false
   },
   {
@@ -118,7 +118,7 @@ export const products = [
     title: 'El túnel',
     author: 'Ernesto Sabato',
     price: 16500,
-    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/16.jpg',
     featured: false
   },
   {
@@ -126,7 +126,7 @@ export const products = [
     title: 'Santa Evita',
     author: 'Tomás Eloy Martínez',
     price: 18750,
-    image: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/17.jpg',
     featured: false
   },
   {
@@ -134,7 +134,7 @@ export const products = [
     title: 'La invención de Morel',
     author: 'Adolfo Bioy Casares',
     price: 14250,
-    image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/18.jpg',
     featured: false
   },
   {
@@ -142,7 +142,7 @@ export const products = [
     title: 'El amor en los tiempos del cólera',
     author: 'Gabriel García Márquez',
     price: 22500,
-    image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/19.jpg',
     featured: false
   },
   {
@@ -150,7 +150,23 @@ export const products = [
     title: 'Sobre la felicidad',
     author: 'Séneca',
     price: 12990,
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=400&h=600&q=80',
+    image: '/src/assets/books/20.jpg',
+    featured: false
+  },
+  {
+    id: 21,
+    title: 'El Principito',
+    author: 'Antoine de Saint-Exupéry',
+    price: 13990,
+    image: '/src/assets/books/21.jpg',
+    featured: false
+  },
+  {
+    id: 22,
+    title: '1984',
+    author: 'George Orwell',
+    price: 15990,
+    image: '/src/assets/books/22.jpg',
     featured: false
   }
 ];
