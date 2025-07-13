@@ -106,8 +106,8 @@ function App() {
   return (
     <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: '#f5f6fa', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {/* AppBar superior */}
-      <AppBar position="static" color="primary" elevation={2} sx={{ width: 1100, mx: 'auto', left: 0, right: 0, borderRadius: 2 }}>
-        <Toolbar sx={{ width: 1100, mx: 'auto', minHeight: 72 }}>
+      <AppBar position="static" color="primary" elevation={2} sx={{ width: '100vw', borderRadius: 0 }}>
+        <Toolbar sx={{ width: '100%', minHeight: 72, maxWidth: '100vw', mx: 'auto', px: 4 }}>
           <IconButton
             edge="start"
             color="inherit"
@@ -146,6 +146,7 @@ function App() {
                 <ShoppingCart sx={{ fontSize: 32 }} />
               </Badge>
             </IconButton>
+            <Button color="inherit" sx={{ ml: 2, fontWeight: 500 }}>Acceder / Registrarme</Button>
           </Box>
         </Toolbar>
       </AppBar>
