@@ -346,6 +346,11 @@
   border: 1px solid #ddd;
   font-size: 1rem;
   background: #f7f7f7;
+  color: #222;
+}
+
+.cus-sort option {
+  color: #222;
 }
 .cus-product-grid {
   display: grid;
