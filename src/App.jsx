@@ -137,7 +137,7 @@ function App() {
             <Button color="inherit">Libros</Button>
             <Button color="inherit">Catálogo</Button>
             <Button color="inherit">Novedades</Button>
-            <Button color="inherit">Ficción</Button>
+            {/* <Button color="inherit">Ficción</Button> */}
             <Button color="inherit">Locales</Button>
             <Button color="inherit">Contacto</Button>
           </Box>
@@ -155,7 +155,7 @@ function App() {
       <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
         <Box sx={{ width: 250 }} role="presentation" onClick={() => setDrawerOpen(false)}>
           <List>
-            {['Libros', 'Catálogo', 'Novedades', 'Ficción', 'Locales', 'Contacto'].map((text) => (
+            {['Libros', 'Catálogo', 'Novedades', 'Locales', 'Contacto'].map((text) => (
               <ListItem button key={text}>
                 <ListItemText primary={text} />
               </ListItem>
