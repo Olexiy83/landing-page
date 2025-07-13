@@ -120,8 +120,8 @@ function App() {
           <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700, mr: 2 }}>
             Librería
           </Typography>
-          <Box sx={{ flexGrow: 1, maxWidth: 350, display: { xs: 'none', sm: 'block' } }}>
-            <Search>
+          <Box sx={{ flexGrow: 0, width: 340, minWidth: 340, maxWidth: 340, display: { xs: 'none', sm: 'block' } }}>
+            <Search sx={{ width: '100%' }}>
               <SearchIconWrapper>
                 <span role="img" aria-label="Buscar">🔍</span>
               </SearchIconWrapper>
@@ -130,6 +130,7 @@ function App() {
                 inputProps={{ 'aria-label': 'buscar libros' }}
                 value={search}
                 onChange={e => setSearch(e.target.value)}
+                sx={{ width: '100%' }}
               />
             </Search>
           </Box>
