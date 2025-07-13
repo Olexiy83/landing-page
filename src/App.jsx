@@ -7,7 +7,7 @@ import { products } from './products';
 import {
   AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper
 } from '@mui/material';
-import { ShoppingCart, Favorite, Menu as MenuIcon } from '@mui/icons-material';
+import { ShoppingCart, Menu as MenuIcon } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 
 // Estilos personalizados para el buscador
@@ -129,9 +129,7 @@ function App() {
             <Button color="inherit">Contacto</Button>
           </Box>
           {/* Input de búsqueda eliminado */}
-          <IconButton color="inherit" sx={{ ml: 2 }}>
-            <Favorite />
-          </IconButton>
+          {/* Icono de favorito eliminado */}
           <IconButton color="inherit" onClick={() => setCartOpen(true)}>
             <Badge badgeContent={cart.length} color="secondary">
               <ShoppingCart />
