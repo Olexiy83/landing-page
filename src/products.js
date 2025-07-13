@@ -95,5 +95,62 @@ export const products = [
     price: 19.50,
     image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=facearea&w=400&h=600&q=80',
     featured: false
+
+  },
+  {
+    id: 14,
+    title: 'Pedro Páramo',
+    author: 'Juan Rulfo',
+    price: 15.99,
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=400&h=600&q=80',
+    featured: false
+  },
+  {
+    id: 15,
+    title: 'La tregua',
+    author: 'Mario Benedetti',
+    price: 17.99,
+    image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=facearea&w=400&h=600&q=80',
+    featured: false
+  },
+  {
+    id: 16,
+    title: 'El túnel',
+    author: 'Ernesto Sabato',
+    price: 16.50,
+    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=facearea&w=400&h=600&q=80',
+    featured: false
+  },
+  {
+    id: 17,
+    title: 'Santa Evita',
+    author: 'Tomás Eloy Martínez',
+    price: 18.75,
+    image: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=facearea&w=400&h=600&q=80',
+    featured: false
+  },
+  {
+    id: 18,
+    title: 'La invención de Morel',
+    author: 'Adolfo Bioy Casares',
+    price: 14.25,
+    image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=facearea&w=400&h=600&q=80',
+    featured: false
+  },
+  {
+    id: 19,
+    title: 'El amor en los tiempos del cólera',
+    author: 'Gabriel García Márquez',
+    price: 22.50,
+    image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=facearea&w=400&h=600&q=80',
+    featured: false
+  },
+  {
+    id: 20,
+    title: 'Sobre la felicidad',
+    author: 'Séneca',
+    price: 12.99,
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=400&h=600&q=80',
+    featured: false
   }
 ];
