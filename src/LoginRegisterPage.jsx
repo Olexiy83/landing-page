@@ -118,8 +118,7 @@ function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = 
                 )}
               </span>
             </IconButton>
-            {/* No mostrar el botón Acceder/Registrarme aquí */}
-            <Button color="inherit" onClick={onBack} sx={{ ml: 2, fontWeight: 500 }}>Volver</Button>
+            {/* No mostrar el botón Acceder/Registrarme ni Volver aquí */}
           </Box>
         </Toolbar>
       </AppBar>
