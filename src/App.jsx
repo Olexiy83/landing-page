@@ -104,10 +104,10 @@ function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <Box sx={{ flexGrow: 1, bgcolor: '#f5f6fa', minHeight: '100vh' }}>
+    <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: '#f5f6fa', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {/* AppBar superior */}
-      <AppBar position="static" color="primary" elevation={2}>
-        <Toolbar>
+      <AppBar position="static" color="primary" elevation={2} sx={{ width: 1100, mx: 'auto', left: 0, right: 0, borderRadius: 2 }}>
+        <Toolbar sx={{ width: 1100, mx: 'auto', minHeight: 72 }}>
           <IconButton
             edge="start"
             color="inherit"
@@ -134,21 +134,19 @@ function App() {
               />
             </Search>
           </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}>
             <Button color="inherit">Libros</Button>
             <Button color="inherit">Catálogo</Button>
             <Button color="inherit">Novedades</Button>
             {/* <Button color="inherit">Ficción</Button> */}
             <Button color="inherit">Locales</Button>
             <Button color="inherit">Contacto</Button>
+            <IconButton color="inherit" onClick={() => setCartOpen(true)} sx={{ ml: 2, height: 48 }}>
+              <Badge badgeContent={cart.length} color="secondary">
+                <ShoppingCart sx={{ fontSize: 32 }} />
+              </Badge>
+            </IconButton>
           </Box>
-          {/* Input de búsqueda eliminado */}
-          {/* Icono de favorito eliminado */}
-          <IconButton color="inherit" onClick={() => setCartOpen(true)}>
-            <Badge badgeContent={cart.length} color="secondary">
-              <ShoppingCart />
-            </Badge>
-          </IconButton>
         </Toolbar>
       </AppBar>
 
@@ -166,7 +164,7 @@ function App() {
       </Drawer>
 
       {/* Layout principal */}
-      <Grid container spacing={2} sx={{ p: 3 }}>
+      <Grid container spacing={2} sx={{ p: 3, width: 1100, mx: 'auto' }}>
         <Grid item xs={12} sm={12} md={12}>
           <Box sx={{ mb: 2, width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
             <Select
