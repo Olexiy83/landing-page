@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, Button, Tabs, Tab, Paper, TextField, Grid, InputBase, IconButton, Drawer, List, ListItem, ListItemText, Divider } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Button, Tabs, Tab, Paper, TextField, Grid, InputBase, IconButton, Drawer, List, ListItem, ListItemText, Divider, FormControlLabel, Checkbox } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 import { Menu as MenuIcon } from '@mui/icons-material';
@@ -43,12 +43,26 @@ function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = 
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({ name: '', email: '', password: '' });
   const [search, setSearch] = useState('');
+  const [remember, setRemember] = useState(() => !!localStorage.getItem('rememberedEmail'));
+
+  // Al cargar, si hay email recordado, lo pone en el campo
+  React.useEffect(() => {
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+      setLoginData((prev) => ({ ...prev, email: rememberedEmail }));
+    }
+  }, []);
 
   const handleTabChange = (event, newValue) => setTab(newValue);
   const handleLoginChange = (e) => setLoginData({ ...loginData, [e.target.name]: e.target.value });
   const handleRegisterChange = (e) => setRegisterData({ ...registerData, [e.target.name]: e.target.value });
   const handleLogin = (e) => {
     e.preventDefault();
+    if (remember) {
+      localStorage.setItem('rememberedEmail', loginData.email);
+    } else {
+      localStorage.removeItem('rememberedEmail');
+    }
     alert('Inicio de sesión simulado');
   };
   const handleRegister = (e) => {
@@ -138,7 +152,20 @@ function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = 
                   <TextField label="Contraseña" name="password" type="password" value={loginData.password} onChange={handleLoginChange} fullWidth required />
                 </Grid>
                 <Grid item>
+                  <FormControlLabel
+                    control={<Checkbox checked={remember} onChange={e => setRemember(e.target.checked)} color="primary" />}
+                    label="Recordar"
+                  />
+                </Grid>
+                <Grid item>
                   <Button type="submit" variant="contained" color="primary" fullWidth>Acceder</Button>
+                </Grid>
+                <Grid item>
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Button color="primary" sx={{ textTransform: 'none', fontSize: 14 }}>
+                      ¿Has perdido tu contraseña?
+                    </Button>
+                  </Box>
                 </Grid>
               </Grid>
             </form>
