@@ -234,6 +234,16 @@ function App() {
           <Typography align="right" fontWeight={700}>
             Total: ARS ${Number(cart.reduce((sum, item) => sum + item.price * item.quantity, 0)).toLocaleString('es-AR', {minimumFractionDigits:2})}
           </Typography>
+          <Button
+            variant="contained"
+            color="success"
+            fullWidth
+            sx={{ mt: 2 }}
+            disabled={cart.length === 0}
+            onClick={() => alert('¡Gracias por su compra!')}
+          >
+            Comprar
+          </Button>
         </Box>
       </Drawer>
     </Box>
