@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, Button, Tabs, Tab, Paper, TextField, Grid, InputBase, IconButton, Drawer, List, ListItem, ListItemText, Divider, FormControlLabel, Checkbox } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Button, Tabs, Tab, Paper, TextField, Grid, InputBase, IconButton, Drawer, List, ListItem, ListItemText, Divider, FormControlLabel, Checkbox, MenuItem } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 import { Menu as MenuIcon } from '@mui/icons-material';
@@ -41,7 +41,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = () => {}, removeFromCart = () => {} }) {
   const [tab, setTab] = useState(0);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [registerData, setRegisterData] = useState({ name: '', email: '', password: '' });
+  const [registerData, setRegisterData] = useState({ name: '', email: '', password: '', docType: 'DNI', docValue: '' });
   const [search, setSearch] = useState('');
   const [remember, setRemember] = useState(() => !!localStorage.getItem('rememberedEmail'));
 
@@ -56,6 +56,7 @@ function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = 
   const handleTabChange = (event, newValue) => setTab(newValue);
   const handleLoginChange = (e) => setLoginData({ ...loginData, [e.target.name]: e.target.value });
   const handleRegisterChange = (e) => setRegisterData({ ...registerData, [e.target.name]: e.target.value });
+  const handleDocTypeChange = (e) => setRegisterData({ ...registerData, docType: e.target.value });
   const handleLogin = (e) => {
     e.preventDefault();
     if (remember) {
@@ -174,10 +175,39 @@ function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = 
             <form onSubmit={handleRegister}>
               <Grid container spacing={2} direction="column">
                 <Grid item>
-                  <TextField label="Nombre completo" name="name" value={registerData.name} onChange={handleRegisterChange} fullWidth required />
+                  <TextField label="Correo electrónico" name="email" value={registerData.email} onChange={handleRegisterChange} fullWidth required />
                 </Grid>
                 <Grid item>
-                  <TextField label="Correo electrónico" name="email" value={registerData.email} onChange={handleRegisterChange} fullWidth required />
+                  <TextField
+                    select
+                    label="Tipo de documento"
+                    name="docType"
+                    value={registerData.docType}
+                    onChange={handleDocTypeChange}
+                    fullWidth
+                    required
+                  >
+                    <MenuItem value="DNI">DNI</MenuItem>
+                    <MenuItem value="CUIT">CUIT</MenuItem>
+                    <MenuItem value="CUIL">CUIL</MenuItem>
+                    <MenuItem value="CI">CI</MenuItem>
+                    <MenuItem value="LE">LE</MenuItem>
+                    <MenuItem value="LC">LC</MenuItem>
+                    <MenuItem value="Pasaporte">Pasaporte, otro</MenuItem>
+                  </TextField>
+                </Grid>
+                <Grid item>
+                  <TextField
+                    label="Ingresá tu DNI, CUIT o pasaporte"
+                    name="docValue"
+                    value={registerData.docValue}
+                    onChange={handleRegisterChange}
+                    fullWidth
+                    required
+                  />
+                </Grid>
+                <Grid item>
+                  <TextField label="Nombre completo" name="name" value={registerData.name} onChange={handleRegisterChange} fullWidth required />
                 </Grid>
                 <Grid item>
                   <TextField label="Contraseña" name="password" type="password" value={registerData.password} onChange={handleRegisterChange} fullWidth required />
