@@ -3,6 +3,7 @@
 
 
 import { useState } from 'react';
+import LoginRegisterPage from './LoginRegisterPage';
 import { products } from './products';
 import {
   AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper
@@ -48,6 +49,7 @@ function App() {
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
   const [sortOption, setSortOption] = useState('popularidad');
+  const [showLogin, setShowLogin] = useState(false);
 
   const addToCart = (product) => {
     setCart((prev) => {
@@ -103,6 +105,18 @@ function App() {
   // Drawer para menú lateral en mobile
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  if (showLogin) {
+    return (
+      <LoginRegisterPage
+        onBack={() => setShowLogin(false)}
+        cart={cart}
+        cartOpen={cartOpen}
+        setCartOpen={setCartOpen}
+        removeFromCart={removeFromCart}
+      />
+    );
+  }
+
   return (
     <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: '#f5f6fa', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {/* AppBar superior */}
@@ -146,7 +160,7 @@ function App() {
                 <ShoppingCart sx={{ fontSize: 32 }} />
               </Badge>
             </IconButton>
-            <Button color="inherit" sx={{ ml: 2, fontWeight: 500 }}>Acceder / Registrarme</Button>
+            <Button color="inherit" sx={{ ml: 2, fontWeight: 500 }} onClick={() => setShowLogin(true)}>Acceder / Registrarme</Button>
           </Box>
         </Toolbar>
       </AppBar>
