@@ -290,6 +290,9 @@ function App() {
         cartOpen={cartOpen}
         setCartOpen={setCartOpen}
         removeFromCart={removeFromCart}
+        updateCartQuantity={updateCartQuantity}
+        increaseQuantity={increaseQuantity}
+        decreaseQuantity={decreaseQuantity}
       />
     );
   }

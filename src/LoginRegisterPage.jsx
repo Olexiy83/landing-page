@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, Button, Tabs, Tab, Paper, TextField, Grid, InputBase, IconButton, Drawer, List, ListItem, ListItemText, Divider, FormControlLabel, Checkbox, MenuItem } from '@mui/material';
-import { ShoppingCart } from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, Box, Button, Tabs, Tab, Paper, TextField, Grid, InputBase, IconButton, Drawer, List, ListItem, ListItemText, Divider, FormControlLabel, Checkbox, MenuItem, Badge } from '@mui/material';
+import { ShoppingCart, Add, Remove } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 import { Menu as MenuIcon } from '@mui/icons-material';
 
@@ -39,7 +39,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 
 
-function LoginRegisterPage({ onBack, onLogin, cart = [], cartOpen = false, setCartOpen = () => {}, removeFromCart = () => {} }) {
+function LoginRegisterPage({ 
+  onBack, 
+  onLogin, 
+  cart = [], 
+  cartOpen = false, 
+  setCartOpen = () => {}, 
+  removeFromCart = () => {},
+  updateCartQuantity = () => {},
+  increaseQuantity = () => {},
+  decreaseQuantity = () => {}
+}) {
   const [tab, setTab] = useState(0);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({ name: '', email: '', password: '', docType: 'DNI', docValue: '' });
@@ -180,25 +190,9 @@ function LoginRegisterPage({ onBack, onLogin, cart = [], cartOpen = false, setCa
             <Button color="inherit" onClick={handleNav}>Locales</Button>
             <Button color="inherit" onClick={handleNav}>Contacto</Button>
             <IconButton color="inherit" onClick={() => setCartOpen(true)} sx={{ ml: 2, height: 48 }}>
-              <span style={{ position: 'relative', display: 'inline-flex' }}>
+              <Badge badgeContent={cart.length} color="secondary">
                 <ShoppingCart sx={{ fontSize: 32 }} />
-                {cart.length > 0 && (
-                  <span style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    background: '#f50057',
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: 20,
-                    height: 20,
-                    fontSize: 12,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>{cart.length}</span>
-                )}
-              </span>
+              </Badge>
             </IconButton>
             {/* No mostrar el botón Acceder/Registrarme ni Volver aquí */}
           </Box>
@@ -338,30 +332,132 @@ function LoginRegisterPage({ onBack, onLogin, cart = [], cartOpen = false, setCa
           >
             ×
           </IconButton>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, pr: 4 }}>Carrito de compras</Typography>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, pr: 4 }}>
+            Carrito de compras
+            {cart.length > 0 && (
+              <Typography component="span" variant="body2" sx={{ ml: 1, color: 'text.secondary' }}>
+                ({cart.reduce((sum, item) => sum + item.quantity, 0)} {cart.reduce((sum, item) => sum + item.quantity, 0) === 1 ? 'artículo' : 'artículos'})
+              </Typography>
+            )}
+          </Typography>
           <Divider sx={{ mb: 2 }} />
           {cart.length === 0 ? (
             <Typography color="text.secondary">El carrito está vacío.</Typography>
           ) : (
             <List>
               {cart.map((item) => (
-                <ListItem key={item.id} secondaryAction={
-                  <Button color="error" size="small" onClick={() => removeFromCart(item.id)}>
-                    Quitar
-                  </Button>
-                }>
-                  <ListItemText
-                    primary={`${item.title} x ${item.quantity}`}
-                    secondary={`ARS $${Number(item.price * item.quantity).toLocaleString('es-AR', {minimumFractionDigits:2})}`}
-                  />
+                <ListItem 
+                  key={item.id} 
+                  sx={{ 
+                    flexDirection: 'column', 
+                    alignItems: 'stretch',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    mb: 1,
+                    p: 2
+                  }}
+                >
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
+                        {item.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                        ARS ${Number(item.price).toLocaleString('es-AR', {minimumFractionDigits:2})} c/u
+                      </Typography>
+                    </Box>
+                    <Button 
+                      color="error" 
+                      size="small" 
+                      onClick={() => removeFromCart(item.id)}
+                      sx={{ minWidth: 'auto', p: 0.5 }}
+                    >
+                      ×
+                    </Button>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography variant="body2" sx={{ mr: 1, color: 'text.secondary' }}>
+                        Cantidad:
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => decreaseQuantity(item.id)}
+                          disabled={item.quantity <= 1}
+                          sx={{ 
+                            borderRadius: 0,
+                            '&:hover': { backgroundColor: '#f5f5f5' }
+                          }}
+                        >
+                          <Remove fontSize="small" />
+                        </IconButton>
+                        <TextField
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const newQuantity = parseInt(e.target.value) || 1;
+                            updateCartQuantity(item.id, newQuantity);
+                          }}
+                          size="small"
+                          sx={{ 
+                            width: 50,
+                            '& .MuiOutlinedInput-root': {
+                              '& fieldset': {
+                                border: 'none'
+                              }
+                            },
+                            '& .MuiInputBase-input': {
+                              textAlign: 'center',
+                              padding: '6px 4px',
+                              fontSize: '0.9rem'
+                            }
+                          }}
+                          inputProps={{ 
+                            min: 1,
+                            max: 99,
+                            type: 'number'
+                          }}
+                        />
+                        <IconButton 
+                          size="small" 
+                          onClick={() => increaseQuantity(item.id)}
+                          sx={{ 
+                            borderRadius: 0,
+                            '&:hover': { backgroundColor: '#f5f5f5' }
+                          }}
+                        >
+                          <Add fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                    
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                        ARS ${Number(item.price * item.quantity).toLocaleString('es-AR', {minimumFractionDigits:2})}
+                      </Typography>
+                      {item.quantity > 1 && (
+                        <Typography variant="caption" color="text.secondary">
+                          ({item.quantity} × ARS ${Number(item.price).toLocaleString('es-AR', {minimumFractionDigits:2})})
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
                 </ListItem>
               ))}
             </List>
           )}
           <Divider sx={{ my: 2 }} />
-          <Typography align="right" fontWeight={700}>
-            Total: ARS ${Number(cart.reduce((sum, item) => sum + item.price * item.quantity, 0)).toLocaleString('es-AR', {minimumFractionDigits:2})}
-          </Typography>
+          <Box sx={{ p: 2, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
+            <Typography align="right" fontWeight={700} variant="h6" color="primary.main">
+              Total: ARS ${Number(cart.reduce((sum, item) => sum + item.price * item.quantity, 0)).toLocaleString('es-AR', {minimumFractionDigits:2})}
+            </Typography>
+            {cart.length > 0 && (
+              <Typography align="right" variant="body2" color="text.secondary">
+                {cart.reduce((sum, item) => sum + item.quantity, 0)} {cart.reduce((sum, item) => sum + item.quantity, 0) === 1 ? 'artículo' : 'artículos'} en total
+              </Typography>
+            )}
+          </Box>
           <Button
             variant="contained"
             color="success"
