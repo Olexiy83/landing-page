@@ -2,13 +2,13 @@
 
 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LoginRegisterPage from './LoginRegisterPage';
 import { products } from './products';
 import {
-  AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper
+  AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
-import { ShoppingCart, Menu as MenuIcon } from '@mui/icons-material';
+import { ShoppingCart, Menu as MenuIcon, ExitToApp, Add, Remove, Person, KeyboardArrowDown } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 
 // Estilos personalizados para el buscador
@@ -50,6 +50,144 @@ function App() {
   const [search, setSearch] = useState('');
   const [sortOption, setSortOption] = useState('popularidad');
   const [showLogin, setShowLogin] = useState(false);
+  const [user, setUser] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [userMenuAnchor, setUserMenuAnchor] = useState(null);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: '',
+    email: '',
+    docType: '',
+    docValue: ''
+  });
+
+  // Check for saved user data on component mount
+  useEffect(() => {
+    try {
+      const savedUser = localStorage.getItem('currentUser');
+      console.log('Checking for saved user data:', savedUser);
+      if (savedUser) {
+        const userData = JSON.parse(savedUser);
+        // Validate that the saved data has the required fields
+        if (userData && userData.id && userData.name && userData.email) {
+          console.log('Valid user data found, logging in user:', userData.name);
+          setUser(userData);
+          // Initialize profile data with saved user data
+          setProfileData({
+            name: userData.name || '',
+            email: userData.email || '',
+            docType: userData.docType || '',
+            docValue: userData.docValue || ''
+          });
+        } else {
+          // Clean up invalid data
+          console.log('Invalid user data found, cleaning up');
+          localStorage.removeItem('currentUser');
+        }
+      } else {
+        console.log('No saved user data found');
+      }
+    } catch (error) {
+      console.error('Error loading saved user data:', error);
+      localStorage.removeItem('currentUser');
+    }
+  }, []);
+
+  const handleLogin = (userData) => {
+    try {
+      console.log('Logging in user:', userData);
+      setUser(userData);
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+      setShowLogin(false);
+      // Initialize profile data with user data
+      setProfileData({
+        name: userData.name || '',
+        email: userData.email || '',
+        docType: userData.docType || '',
+        docValue: userData.docValue || ''
+      });
+    } catch (error) {
+      console.error('Error saving user data:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    try {
+      console.log('Logging out user:', user?.name);
+      setUser(null);
+      localStorage.removeItem('currentUser');
+      setCart([]); // Clear cart on logout
+      setUserMenuAnchor(null);
+      setProfileData({ name: '', email: '', docType: '', docValue: '' });
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
+  const handleUserMenuClick = (event) => {
+    setUserMenuAnchor(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setUserMenuAnchor(null);
+  };
+
+  const handleProfileClick = () => {
+    if (user) {
+      setProfileData({
+        name: user.name || '',
+        email: user.email || '',
+        docType: user.docType || '',
+        docValue: user.docValue || ''
+      });
+    }
+    setProfileDialogOpen(true);
+    handleUserMenuClose();
+  };
+
+  const handleProfileClose = () => {
+    setProfileDialogOpen(false);
+  };
+
+  const handleProfileDataChange = (e) => {
+    setProfileData({
+      ...profileData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleProfileSave = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/update-profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          ...profileData
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        const updatedUser = { ...user, ...profileData };
+        setUser(updatedUser);
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        setSnackbarMessage('Perfil actualizado exitosamente');
+        setSnackbarOpen(true);
+        setProfileDialogOpen(false);
+      } else {
+        setSnackbarMessage('Error al actualizar el perfil: ' + (result.error || 'Error desconocido'));
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      setSnackbarMessage('Error de conexión al actualizar el perfil');
+      setSnackbarOpen(true);
+    }
+  };
 
   const addToCart = (product) => {
     setCart((prev) => {
@@ -65,6 +203,44 @@ function App() {
 
   const removeFromCart = (id) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const updateCartQuantity = (id, newQuantity) => {
+    if (newQuantity <= 0) {
+      removeFromCart(id);
+      return;
+    }
+    if (newQuantity > 99) {
+      // Limit maximum quantity to 99
+      newQuantity = 99;
+    }
+    setCart((prev) => 
+      prev.map((item) => 
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  };
+
+  const increaseQuantity = (id) => {
+    setCart((prev) => 
+      prev.map((item) => 
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+    setSnackbarMessage('Cantidad actualizada');
+    setSnackbarOpen(true);
+  };
+
+  const decreaseQuantity = (id) => {
+    setCart((prev) => 
+      prev.map((item) => 
+        item.id === id 
+          ? { ...item, quantity: Math.max(1, item.quantity - 1) } 
+          : item
+      )
+    );
+    setSnackbarMessage('Cantidad actualizada');
+    setSnackbarOpen(true);
   };
 
   let filteredProducts = products.filter(
@@ -109,6 +285,7 @@ function App() {
     return (
       <LoginRegisterPage
         onBack={() => setShowLogin(false)}
+        onLogin={handleLogin}
         cart={cart}
         cartOpen={cartOpen}
         setCartOpen={setCartOpen}
@@ -160,7 +337,77 @@ function App() {
                 <ShoppingCart sx={{ fontSize: 32 }} />
               </Badge>
             </IconButton>
-            <Button color="inherit" sx={{ ml: 2, fontWeight: 500 }} onClick={() => setShowLogin(true)}>Acceder / Registrarme</Button>
+            {user ? (
+              <Box sx={{ 
+                ml: 2, 
+                display: 'flex', 
+                alignItems: 'center'
+              }}>
+                <Button
+                  color="inherit"
+                  onClick={handleUserMenuClick}
+                  sx={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+                    borderRadius: 3, 
+                    px: 2, 
+                    py: 0.5,
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                    }
+                  }}
+                  endIcon={<KeyboardArrowDown />}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box 
+                      sx={{ 
+                        width: 8, 
+                        height: 8, 
+                        backgroundColor: '#4caf50', 
+                        borderRadius: '50%', 
+                        mr: 1 
+                      }} 
+                    />
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        fontWeight: 600,
+                        color: 'white'
+                      }}
+                    >
+                      {user.name}
+                    </Typography>
+                  </Box>
+                </Button>
+                
+                <Menu
+                  anchorEl={userMenuAnchor}
+                  open={Boolean(userMenuAnchor)}
+                  onClose={handleUserMenuClose}
+                  PaperProps={{
+                    sx: {
+                      mt: 1,
+                      minWidth: 180
+                    }
+                  }}
+                >
+                  <MenuItem onClick={handleProfileClick}>
+                    <Person sx={{ mr: 1 }} />
+                    Perfil de usuario
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={handleLogout}>
+                    <ExitToApp sx={{ mr: 1 }} />
+                    Cerrar sesión
+                  </MenuItem>
+                </Menu>
+              </Box>
+            ) : (
+              <Button color="inherit" sx={{ ml: 2, fontWeight: 500 }} onClick={() => setShowLogin(true)}>
+                Acceder / Registrarme
+              </Button>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
@@ -235,30 +482,132 @@ function App() {
           >
             ×
           </IconButton>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, pr: 4 }}>Carrito de compras</Typography>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, pr: 4 }}>
+            Carrito de compras
+            {cart.length > 0 && (
+              <Typography component="span" variant="body2" sx={{ ml: 1, color: 'text.secondary' }}>
+                ({cart.reduce((sum, item) => sum + item.quantity, 0)} {cart.reduce((sum, item) => sum + item.quantity, 0) === 1 ? 'artículo' : 'artículos'})
+              </Typography>
+            )}
+          </Typography>
           <Divider sx={{ mb: 2 }} />
           {cart.length === 0 ? (
             <Typography color="text.secondary">El carrito está vacío.</Typography>
           ) : (
             <List>
               {cart.map((item) => (
-                <ListItem key={item.id} secondaryAction={
-                  <Button color="error" size="small" onClick={() => removeFromCart(item.id)}>
-                    Quitar
-                  </Button>
-                }>
-                  <ListItemText
-                    primary={`${item.title} x ${item.quantity}`}
-                    secondary={`ARS $${Number(item.price * item.quantity).toLocaleString('es-AR', {minimumFractionDigits:2})}`}
-                  />
+                <ListItem 
+                  key={item.id} 
+                  sx={{ 
+                    flexDirection: 'column', 
+                    alignItems: 'stretch',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    mb: 1,
+                    p: 2
+                  }}
+                >
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
+                        {item.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                        ARS ${Number(item.price).toLocaleString('es-AR', {minimumFractionDigits:2})} c/u
+                      </Typography>
+                    </Box>
+                    <Button 
+                      color="error" 
+                      size="small" 
+                      onClick={() => removeFromCart(item.id)}
+                      sx={{ minWidth: 'auto', p: 0.5 }}
+                    >
+                      ×
+                    </Button>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography variant="body2" sx={{ mr: 1, color: 'text.secondary' }}>
+                        Cantidad:
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => decreaseQuantity(item.id)}
+                          disabled={item.quantity <= 1}
+                          sx={{ 
+                            borderRadius: 0,
+                            '&:hover': { backgroundColor: '#f5f5f5' }
+                          }}
+                        >
+                          <Remove fontSize="small" />
+                        </IconButton>
+                        <TextField
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const newQuantity = parseInt(e.target.value) || 1;
+                            updateCartQuantity(item.id, newQuantity);
+                          }}
+                          size="small"
+                          sx={{ 
+                            width: 50,
+                            '& .MuiOutlinedInput-root': {
+                              '& fieldset': {
+                                border: 'none'
+                              }
+                            },
+                            '& .MuiInputBase-input': {
+                              textAlign: 'center',
+                              padding: '6px 4px',
+                              fontSize: '0.9rem'
+                            }
+                          }}
+                          inputProps={{ 
+                            min: 1,
+                            max: 99,
+                            type: 'number'
+                          }}
+                        />
+                        <IconButton 
+                          size="small" 
+                          onClick={() => increaseQuantity(item.id)}
+                          sx={{ 
+                            borderRadius: 0,
+                            '&:hover': { backgroundColor: '#f5f5f5' }
+                          }}
+                        >
+                          <Add fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                    
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                        ARS ${Number(item.price * item.quantity).toLocaleString('es-AR', {minimumFractionDigits:2})}
+                      </Typography>
+                      {item.quantity > 1 && (
+                        <Typography variant="caption" color="text.secondary">
+                          ({item.quantity} × ARS ${Number(item.price).toLocaleString('es-AR', {minimumFractionDigits:2})})
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
                 </ListItem>
               ))}
             </List>
           )}
           <Divider sx={{ my: 2 }} />
-          <Typography align="right" fontWeight={700}>
-            Total: ARS ${Number(cart.reduce((sum, item) => sum + item.price * item.quantity, 0)).toLocaleString('es-AR', {minimumFractionDigits:2})}
-          </Typography>
+          <Box sx={{ p: 2, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
+            <Typography align="right" fontWeight={700} variant="h6" color="primary.main">
+              Total: ARS ${Number(cart.reduce((sum, item) => sum + item.price * item.quantity, 0)).toLocaleString('es-AR', {minimumFractionDigits:2})}
+            </Typography>
+            {cart.length > 0 && (
+              <Typography align="right" variant="body2" color="text.secondary">
+                {cart.reduce((sum, item) => sum + item.quantity, 0)} {cart.reduce((sum, item) => sum + item.quantity, 0) === 1 ? 'artículo' : 'artículos'} en total
+              </Typography>
+            )}
+          </Box>
           <Button
             variant="contained"
             color="success"
@@ -271,6 +620,92 @@ function App() {
           </Button>
         </Box>
       </Drawer>
+
+      {/* Dialog para editar perfil de usuario */}
+      <Dialog open={profileDialogOpen} onClose={handleProfileClose} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Person sx={{ mr: 1 }} />
+            Perfil de Usuario
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 2 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  label="Nombre completo"
+                  name="name"
+                  value={profileData.name}
+                  onChange={handleProfileDataChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Correo electrónico"
+                  name="email"
+                  value={profileData.email}
+                  onChange={handleProfileDataChange}
+                  fullWidth
+                  required
+                  type="email"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  select
+                  label="Tipo de documento"
+                  name="docType"
+                  value={profileData.docType}
+                  onChange={handleProfileDataChange}
+                  fullWidth
+                  required
+                >
+                  <MenuItem value="DNI">DNI</MenuItem>
+                  <MenuItem value="CUIT">CUIT</MenuItem>
+                  <MenuItem value="CUIL">CUIL</MenuItem>
+                  <MenuItem value="CI">CI</MenuItem>
+                  <MenuItem value="LE">LE</MenuItem>
+                  <MenuItem value="LC">LC</MenuItem>
+                  <MenuItem value="Pasaporte">Pasaporte, otro</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Número de documento"
+                  name="docValue"
+                  value={profileData.docValue}
+                  onChange={handleProfileDataChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+          <Button onClick={handleProfileClose} color="inherit">
+            Cancelar
+          </Button>
+          <Button onClick={handleProfileSave} variant="contained" color="primary">
+            Guardar Cambios
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar para notificaciones */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

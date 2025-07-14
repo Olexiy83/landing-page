@@ -8,9 +8,21 @@ CREATE TABLE IF NOT EXISTS books (
     image_url TEXT
 );
 
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    doc_type TEXT NOT NULL,
+    doc_value TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS cart (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     book_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
-    FOREIGN KEY(book_id) REFERENCES books(id)
+    user_id INTEGER,
+    FOREIGN KEY(book_id) REFERENCES books(id),
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );

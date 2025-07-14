@@ -39,13 +39,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 
 
-function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = () => {}, removeFromCart = () => {} }) {
+function LoginRegisterPage({ onBack, onLogin, cart = [], cartOpen = false, setCartOpen = () => {}, removeFromCart = () => {} }) {
   const [tab, setTab] = useState(0);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({ name: '', email: '', password: '', docType: 'DNI', docValue: '' });
   const [search, setSearch] = useState('');
   const [remember, setRemember] = useState(() => !!localStorage.getItem('rememberedEmail'));
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Al cargar, si hay email recordado, lo pone en el campo
   React.useEffect(() => {
@@ -55,22 +57,85 @@ function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = 
     }
   }, []);
 
+  // Check if user is already logged in and redirect if so
+  React.useEffect(() => {
+    try {
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        const userData = JSON.parse(savedUser);
+        if (userData && userData.id && userData.name && userData.email) {
+          // User is already logged in, redirect back
+          onLogin(userData);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking saved user:', error);
+    }
+  }, [onLogin]);
+
   const handleTabChange = (event, newValue) => setTab(newValue);
   const handleLoginChange = (e) => setLoginData({ ...loginData, [e.target.name]: e.target.value });
   const handleRegisterChange = (e) => setRegisterData({ ...registerData, [e.target.name]: e.target.value });
   const handleDocTypeChange = (e) => setRegisterData({ ...registerData, docType: e.target.value });
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (remember) {
-      localStorage.setItem('rememberedEmail', loginData.email);
-    } else {
-      localStorage.removeItem('rememberedEmail');
+    setLoading(true);
+    setError('');
+    
+    try {
+      const response = await fetch('http://localhost:3001/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        if (remember) {
+          localStorage.setItem('rememberedEmail', loginData.email);
+        } else {
+          localStorage.removeItem('rememberedEmail');
+        }
+        onLogin(result.user);
+      } else {
+        setError(result.error || 'Error al iniciar sesión');
+      }
+    } catch (err) {
+      setError('Error de conexión. Asegúrese de que el servidor esté ejecutándose.');
+    } finally {
+      setLoading(false);
     }
-    alert('Inicio de sesión simulado');
   };
-  const handleRegister = (e) => {
+
+  const handleRegister = async (e) => {
     e.preventDefault();
-    alert('Registro simulado');
+    setLoading(true);
+    setError('');
+    
+    try {
+      const response = await fetch('http://localhost:3001/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registerData),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        onLogin(result.user);
+      } else {
+        setError(result.error || 'Error al registrarse');
+      }
+    } catch (err) {
+      setError('Error de conexión. Asegúrese de que el servidor esté ejecutándose.');
+    } finally {
+      setLoading(false);
+    }
   };
   const handleNav = () => onBack && onBack();
   const handleForgotPasswordClick = () => setShowForgotPassword(true);
@@ -149,25 +214,34 @@ function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = 
               </Tabs>
               {tab === 0 && (
                 <form onSubmit={handleLogin}>
+                  {error && (
+                    <Grid item>
+                      <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+                        {error}
+                      </Typography>
+                    </Grid>
+                  )}
                   <Grid container spacing={2} direction="column">
                     <Grid item>
-                      <TextField label="Correo electrónico" name="email" value={loginData.email} onChange={handleLoginChange} fullWidth required />
+                      <TextField label="Correo electrónico" name="email" value={loginData.email} onChange={handleLoginChange} fullWidth required disabled={loading} />
                     </Grid>
                     <Grid item>
-                      <TextField label="Contraseña" name="password" type="password" value={loginData.password} onChange={handleLoginChange} fullWidth required />
+                      <TextField label="Contraseña" name="password" type="password" value={loginData.password} onChange={handleLoginChange} fullWidth required disabled={loading} />
                     </Grid>
                     <Grid item>
                       <FormControlLabel
-                        control={<Checkbox checked={remember} onChange={e => setRemember(e.target.checked)} color="primary" />}
+                        control={<Checkbox checked={remember} onChange={e => setRemember(e.target.checked)} color="primary" disabled={loading} />}
                         label="Recordar"
                       />
                     </Grid>
                     <Grid item>
-                      <Button type="submit" variant="contained" color="primary" fullWidth>Acceder</Button>
+                      <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
+                        {loading ? 'Iniciando sesión...' : 'Acceder'}
+                      </Button>
                     </Grid>
                     <Grid item>
                       <Box sx={{ textAlign: 'right' }}>
-                        <Button color="primary" sx={{ textTransform: 'none', fontSize: 14 }} onClick={handleForgotPasswordClick}>
+                        <Button color="primary" sx={{ textTransform: 'none', fontSize: 14 }} onClick={handleForgotPasswordClick} disabled={loading}>
                           ¿Has perdido tu contraseña?
                         </Button>
                       </Box>
@@ -177,9 +251,16 @@ function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = 
               )}
               {tab === 1 && (
                 <form onSubmit={handleRegister}>
+                  {error && (
+                    <Grid item>
+                      <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+                        {error}
+                      </Typography>
+                    </Grid>
+                  )}
                   <Grid container spacing={2} direction="column">
                     <Grid item>
-                      <TextField label="Correo electrónico" name="email" value={registerData.email} onChange={handleRegisterChange} fullWidth required />
+                      <TextField label="Correo electrónico" name="email" value={registerData.email} onChange={handleRegisterChange} fullWidth required disabled={loading} />
                     </Grid>
                     <Grid item>
                       <TextField
@@ -190,6 +271,7 @@ function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = 
                         onChange={handleDocTypeChange}
                         fullWidth
                         required
+                        disabled={loading}
                       >
                         <MenuItem value="DNI">DNI</MenuItem>
                         <MenuItem value="CUIT">CUIT</MenuItem>
@@ -208,16 +290,19 @@ function LoginRegisterPage({ onBack, cart = [], cartOpen = false, setCartOpen = 
                         onChange={handleRegisterChange}
                         fullWidth
                         required
+                        disabled={loading}
                       />
                     </Grid>
                     <Grid item>
-                      <TextField label="Nombre completo" name="name" value={registerData.name} onChange={handleRegisterChange} fullWidth required />
+                      <TextField label="Nombre completo" name="name" value={registerData.name} onChange={handleRegisterChange} fullWidth required disabled={loading} />
                     </Grid>
                     <Grid item>
-                      <TextField label="Contraseña" name="password" type="password" value={registerData.password} onChange={handleRegisterChange} fullWidth required />
+                      <TextField label="Contraseña" name="password" type="password" value={registerData.password} onChange={handleRegisterChange} fullWidth required disabled={loading} />
                     </Grid>
                     <Grid item>
-                      <Button type="submit" variant="contained" color="primary" fullWidth>Registrarme</Button>
+                      <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
+                        {loading ? 'Registrando...' : 'Registrarme'}
+                      </Button>
                     </Grid>
                   </Grid>
                 </form>
