@@ -293,6 +293,7 @@ function App() {
         updateCartQuantity={updateCartQuantity}
         increaseQuantity={increaseQuantity}
         decreaseQuantity={decreaseQuantity}
+        user={user}
       />
     );
   }
@@ -616,10 +617,10 @@ function App() {
             color="success"
             fullWidth
             sx={{ mt: 2 }}
-            disabled={cart.length === 0}
+            disabled={cart.length === 0 || !user}
             onClick={() => alert('¡Gracias por su compra!')}
           >
-            Comprar
+            {!user ? 'Inicia sesión para comprar' : 'Comprar'}
           </Button>
         </Box>
       </Drawer>
