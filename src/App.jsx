@@ -4,9 +4,8 @@
 
 import { useState, useEffect } from 'react';
 import LoginRegisterPage from './LoginRegisterPage';
-import { products } from './products';
 import {
-  AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions
+  AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress
 } from '@mui/material';
 import { ShoppingCart, Menu as MenuIcon, ExitToApp, Add, Remove, Person, KeyboardArrowDown } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
@@ -55,6 +54,9 @@ function App() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [profileData, setProfileData] = useState({
     name: '',
     email: '',
@@ -92,6 +94,30 @@ function App() {
       console.error('Error loading saved user data:', error);
       localStorage.removeItem('currentUser');
     }
+  }, []);
+
+  // Fetch products from database
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:3001/api/products');
+        if (!response.ok) {
+          throw new Error('Error fetching products');
+        }
+        const productsData = await response.json();
+        console.log('Products fetched from database:', productsData);
+        setProducts(productsData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('Error loading products. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   const handleLogin = (userData) => {
@@ -446,31 +472,55 @@ function App() {
             </Select>
           </Box>
           <Grid container spacing={2} justifyContent="center" alignItems="center">
-            {filteredProducts.map((book) => (
-              <Grid item xs={12} sm={6} md={4} key={book.id} sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 3, alignItems: 'center', textAlign: 'center', minWidth: 260, maxWidth: 320 }}>
-                  <CardMedia
-                    component="img"
-                    height="180"
-                    image={book.image}
-                    alt={book.title}
-                    sx={{ objectFit: 'contain', p: 1, bgcolor: '#f8f8f8', mx: 'auto' }}
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>{book.title}</Typography>
-                    <Typography variant="body2" color="text.secondary">{book.author}</Typography>
-                    <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 700 }}>
-                      ARS ${book.price.toLocaleString('es-AR', {minimumFractionDigits:2})}
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ width: '100%' }}>
-                    <Button variant="contained" color="primary" fullWidth onClick={() => addToCart(book)}>
-                      Agregar al carrito
-                    </Button>
-                  </CardActions>
-                </Card>
+            {loading ? (
+              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <CircularProgress size={60} />
+                  <Typography variant="h6" sx={{ mt: 2 }}>Cargando productos...</Typography>
+                </Box>
               </Grid>
-            ))}
+            ) : error ? (
+              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h6" color="error" sx={{ mb: 2 }}>{error}</Typography>
+                  <Button variant="contained" onClick={() => window.location.reload()}>
+                    Reintentar
+                  </Button>
+                </Box>
+              </Grid>
+            ) : filteredProducts.length === 0 ? (
+              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+                <Typography variant="h6" color="text.secondary">
+                  No se encontraron productos que coincidan con tu búsqueda.
+                </Typography>
+              </Grid>
+            ) : (
+              filteredProducts.map((book) => (
+                <Grid item xs={12} sm={6} md={4} key={book.id} sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 3, alignItems: 'center', textAlign: 'center', minWidth: 260, maxWidth: 320 }}>
+                    <CardMedia
+                      component="img"
+                      height="180"
+                      image={book.image}
+                      alt={book.title}
+                      sx={{ objectFit: 'contain', p: 1, bgcolor: '#f8f8f8', mx: 'auto' }}
+                    />
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>{book.title}</Typography>
+                      <Typography variant="body2" color="text.secondary">{book.author}</Typography>
+                      <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 700 }}>
+                        ARS ${book.price.toLocaleString('es-AR', {minimumFractionDigits:2})}
+                      </Typography>
+                    </CardContent>
+                    <CardActions sx={{ width: '100%' }}>
+                      <Button variant="contained" color="primary" fullWidth onClick={() => addToCart(book)}>
+                        Agregar al carrito
+                      </Button>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))
+            )}
           </Grid>
         </Grid>
       </Grid>
