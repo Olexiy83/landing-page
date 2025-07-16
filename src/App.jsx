@@ -6,10 +6,12 @@ import { useState, useEffect } from 'react';
 import LoginRegisterPage from './LoginRegisterPage';
 import UserManagement from './UserManagement';
 import ProductManagement from './ProductManagement';
+import ContactForm from './ContactForm';
+import MessagesManagement from './MessagesManagement';
 import {
   AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress
 } from '@mui/material';
-import { ShoppingCart, Menu as MenuIcon, ExitToApp, Add, Remove, Person, KeyboardArrowDown, Inventory } from '@mui/icons-material';
+import { ShoppingCart, Menu as MenuIcon, ExitToApp, Add, Remove, Person, KeyboardArrowDown, Inventory, Email } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 
 // Estilos personalizados para el buscador
@@ -53,6 +55,8 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showProductManagement, setShowProductManagement] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [showMessagesManagement, setShowMessagesManagement] = useState(false);
   const [user, setUser] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -421,6 +425,26 @@ function App() {
     );
   }
 
+  if (showContactForm) {
+    return (
+      <ContactForm
+        onBack={() => setShowContactForm(false)}
+        cart={cart}
+        cartOpen={cartOpen}
+        setCartOpen={setCartOpen}
+      />
+    );
+  }
+
+  if (showMessagesManagement) {
+    return (
+      <MessagesManagement
+        onBack={() => setShowMessagesManagement(false)}
+        user={user}
+      />
+    );
+  }
+
   return (
     <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: '#f5f6fa', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {/* AppBar superior */}
@@ -463,7 +487,7 @@ function App() {
             <Button color="inherit">Novedades</Button>
             {/* <Button color="inherit">Ficción</Button> */}
             <Button color="inherit">Locales</Button>
-            <Button color="inherit">Contacto</Button>
+            <Button color="inherit" onClick={() => setShowContactForm(true)}>Contacto</Button>
             <IconButton color="inherit" onClick={() => setCartOpen(true)} sx={{ ml: 2, height: 48 }}>
               <Badge badgeContent={cart.length} color="secondary">
                 <ShoppingCart sx={{ fontSize: 32 }} />
@@ -545,6 +569,13 @@ function App() {
                         <Inventory sx={{ mr: 1 }} />
                         Administrar productos
                       </MenuItem>
+                      <MenuItem onClick={() => {
+                        handleUserMenuClose();
+                        setShowMessagesManagement(true);
+                      }}>
+                        <Email sx={{ mr: 1 }} />
+                        Mensajes enviados
+                      </MenuItem>
                     </>
                   )}
                   <Divider />
@@ -595,10 +626,19 @@ function App() {
 
       {/* Drawer lateral para mobile */}
       <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-        <Box sx={{ width: 250 }} role="presentation" onClick={() => setDrawerOpen(false)}>
+        <Box sx={{ width: 250 }} role="presentation">
           <List>
             {['Libros', 'Novedades', 'Locales', 'Contacto'].map((text) => (
-              <ListItem button key={text}>
+              <ListItem 
+                button 
+                key={text} 
+                onClick={() => {
+                  if (text === 'Contacto') {
+                    setShowContactForm(true);
+                  }
+                  setDrawerOpen(false);
+                }}
+              >
                 <ListItemText primary={text} />
               </ListItem>
             ))}

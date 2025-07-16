@@ -185,7 +185,6 @@ function LoginRegisterPage({
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}>
             <Button color="inherit" onClick={handleNav}>Libros</Button>
-            <Button color="inherit" onClick={handleNav}>Catálogo</Button>
             <Button color="inherit" onClick={handleNav}>Novedades</Button>
             {/* <Button color="inherit" onClick={handleNav}>Ficción</Button> */}
             <Button color="inherit" onClick={handleNav}>Locales</Button>

@@ -1,4 +1,3 @@
-
 import sys
 import sqlite3
 import json
@@ -384,6 +383,127 @@ def get_cart():
     conn.close()
     print(json.dumps(cart))
 
+def save_contact_message(message_data):
+    """Save a contact message to the database"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    try:
+        # Create table if not exists
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS contact_messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                phone TEXT,
+                subject TEXT NOT NULL,
+                message TEXT NOT NULL,
+                status TEXT DEFAULT 'nuevo',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Insert contact message
+        c.execute('''
+            INSERT INTO contact_messages (name, email, phone, subject, message) 
+            VALUES (?, ?, ?, ?, ?)
+        ''', (message_data['name'], message_data['email'], message_data.get('phone', ''), 
+              message_data['subject'], message_data['message']))
+        
+        message_id = c.lastrowid
+        conn.commit()
+        conn.close()
+        
+        print(json.dumps({
+            "success": True, 
+            "message": "Mensaje de contacto guardado exitosamente",
+            "messageId": message_id
+        }))
+    except Exception as e:
+        conn.close()
+        print(json.dumps({"success": False, "error": str(e)}))
+
+def get_contact_messages():
+    """Get all contact messages for admin"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    try:
+        c.execute('''
+            SELECT id, name, email, phone, subject, message, status, 
+                   created_at, updated_at 
+            FROM contact_messages 
+            ORDER BY created_at DESC
+        ''')
+        messages = c.fetchall()
+        conn.close()
+        
+        messages_list = []
+        for msg in messages:
+            messages_list.append({
+                "id": msg[0],
+                "name": msg[1],
+                "email": msg[2],
+                "phone": msg[3] or '',
+                "subject": msg[4],
+                "message": msg[5],
+                "status": msg[6],
+                "date": msg[7].split(' ')[0] if msg[7] else '',
+                "time": msg[7].split(' ')[1].split('.')[0] if msg[7] and ' ' in msg[7] else '',
+                "created_at": msg[7],
+                "updated_at": msg[8]
+            })
+        
+        print(json.dumps({
+            "success": True,
+            "messages": messages_list
+        }))
+    except Exception as e:
+        conn.close()
+        print(json.dumps({"success": False, "error": str(e)}))
+
+def update_message_status(message_id, status):
+    """Update message status"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    try:
+        c.execute('''
+            UPDATE contact_messages 
+            SET status = ?, updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+        ''', (status, message_id))
+        
+        conn.commit()
+        conn.close()
+        
+        print(json.dumps({
+            "success": True,
+            "message": "Estado del mensaje actualizado exitosamente"
+        }))
+    except Exception as e:
+        conn.close()
+        print(json.dumps({"success": False, "error": str(e)}))
+
+def delete_contact_message(message_id):
+    """Delete a contact message"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    try:
+        c.execute('DELETE FROM contact_messages WHERE id = ?', (message_id,))
+        conn.commit()
+        conn.close()
+        
+        print(json.dumps({
+            "success": True,
+            "message": "Mensaje eliminado exitosamente"
+        }))
+    except Exception as e:
+        conn.close()
+        print(json.dumps({"success": False, "error": str(e)}))
+
 def main():
     if len(sys.argv) < 2:
         print(json.dumps({"error": "No command"}))
@@ -428,6 +548,24 @@ def main():
             delete_user(user_id)
         else:
             print(json.dumps({"error": "User ID required"}))
+    elif cmd == 'save_contact_message':
+        message_data = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
+        save_contact_message(message_data)
+    elif cmd == 'get_contact_messages':
+        get_contact_messages()
+    elif cmd == 'update_message_status':
+        message_id = sys.argv[2] if len(sys.argv) > 2 else None
+        status = sys.argv[3] if len(sys.argv) > 3 else None
+        if message_id and status:
+            update_message_status(message_id, status)
+        else:
+            print(json.dumps({"error": "Message ID and status required"}))
+    elif cmd == 'delete_contact_message':
+        message_id = sys.argv[2] if len(sys.argv) > 2 else None
+        if message_id:
+            delete_contact_message(message_id)
+        else:
+            print(json.dumps({"error": "Message ID required"}))
     else:
         print(json.dumps({"error": "Unknown command"}))
 
