@@ -8,7 +8,7 @@ import UserManagement from './UserManagement';
 import {
   AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress
 } from '@mui/material';
-import { ShoppingCart, Menu as MenuIcon, ExitToApp, Add, Remove, Person, KeyboardArrowDown } from '@mui/icons-material';
+import { ShoppingCart, Menu as MenuIcon, ExitToApp, Add, Remove, Person, KeyboardArrowDown, Inventory } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 
 // Estilos personalizados para el buscador
@@ -502,6 +502,14 @@ function App() {
                       }}>
                         <Person sx={{ mr: 1 }} />
                         Administrar usuarios
+                      </MenuItem>
+                      <MenuItem onClick={() => {
+                        handleUserMenuClose();
+                        // TODO: Implementar administración de productos
+                        alert('Función "Administrar productos" en desarrollo');
+                      }}>
+                        <Inventory sx={{ mr: 1 }} />
+                        Administrar productos
                       </MenuItem>
                     </>
                   )}
