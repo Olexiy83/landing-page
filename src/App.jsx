@@ -622,20 +622,37 @@ function App() {
               <MenuItem value="precio">Ordenar por el precio</MenuItem>
             </Select>
             {selectedCategory && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="body2" color="text.secondary">
-                  Categoría:
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {selectedCategory}
-                </Typography>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 2,
+                backgroundColor: '#e3f2fd',
+                padding: '8px 16px',
+                borderRadius: 2,
+                border: '1px solid #bbdefb'
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Filtro activo:
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    {selectedCategory}
+                  </Typography>
+                </Box>
                 <Button 
                   size="small" 
-                  variant="outlined" 
+                  variant="contained" 
+                  color="secondary"
                   onClick={() => handleCategorySelect('')}
-                  sx={{ ml: 1 }}
+                  sx={{ 
+                    minWidth: 'auto',
+                    fontSize: '0.75rem',
+                    py: 0.5,
+                    px: 1.5,
+                    textTransform: 'none'
+                  }}
                 >
-                  Limpiar filtro
+                  ✕ Limpiar
                 </Button>
               </Box>
             )}
