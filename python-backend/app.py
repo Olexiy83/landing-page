@@ -96,6 +96,17 @@ def update_user_profile(update_data):
                 print(json.dumps({"success": False, "error": "Email already in use by another user"}))
                 return
         
+        # If password change is requested, verify current password first
+        if 'currentPassword' in update_data and 'newPassword' in update_data:
+            current_password_hash = hash_password(update_data['currentPassword'])
+            c.execute('SELECT password FROM users WHERE id = ?', (user_id,))
+            stored_password = c.fetchone()
+            
+            if not stored_password or stored_password[0] != current_password_hash:
+                conn.close()
+                print(json.dumps({"success": False, "error": "Contraseña actual incorrecta"}))
+                return
+        
         # Update user data
         update_fields = []
         update_values = []
@@ -112,6 +123,9 @@ def update_user_profile(update_data):
         if 'docValue' in update_data:
             update_fields.append('doc_value = ?')
             update_values.append(update_data['docValue'])
+        if 'newPassword' in update_data:
+            update_fields.append('password = ?')
+            update_values.append(hash_password(update_data['newPassword']))
         
         if update_fields:
             update_values.append(user_id)

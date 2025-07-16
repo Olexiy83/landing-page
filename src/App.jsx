@@ -56,6 +56,7 @@ function App() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -63,7 +64,10 @@ function App() {
     name: '',
     email: '',
     docType: '',
-    docValue: ''
+    docValue: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
 
   // Check for saved user data on component mount
@@ -133,7 +137,10 @@ function App() {
         name: userData.name || '',
         email: userData.email || '',
         docType: userData.docType || '',
-        docValue: userData.docValue || ''
+        docValue: userData.docValue || '',
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
       });
     } catch (error) {
       console.error('Error saving user data:', error);
@@ -147,7 +154,7 @@ function App() {
       localStorage.removeItem('currentUser');
       setCart([]); // Clear cart on logout
       setUserMenuAnchor(null);
-      setProfileData({ name: '', email: '', docType: '', docValue: '' });
+      setProfileData({ name: '', email: '', docType: '', docValue: '', currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (error) {
       console.error('Error during logout:', error);
     }
@@ -167,7 +174,10 @@ function App() {
         name: user.name || '',
         email: user.email || '',
         docType: user.docType || '',
-        docValue: user.docValue || ''
+        docValue: user.docValue || '',
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
       });
     }
     setProfileDialogOpen(true);
@@ -176,6 +186,14 @@ function App() {
 
   const handleProfileClose = () => {
     setProfileDialogOpen(false);
+    setShowPasswordFields(false);
+    // Limpiar campos de contraseña al cerrar
+    setProfileData(prev => ({
+      ...prev,
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    }));
   };
 
   const handleProfileDataChange = (e) => {
@@ -187,6 +205,30 @@ function App() {
 
   const handleProfileSave = async () => {
     try {
+      // Validaciones de contraseña si se está intentando cambiar
+      if (profileData.newPassword || profileData.confirmPassword || profileData.currentPassword) {
+        if (!profileData.currentPassword) {
+          setSnackbarMessage('Debe ingresar su contraseña actual para cambiarla');
+          setSnackbarOpen(true);
+          return;
+        }
+        if (!profileData.newPassword) {
+          setSnackbarMessage('Debe ingresar una nueva contraseña');
+          setSnackbarOpen(true);
+          return;
+        }
+        if (profileData.newPassword !== profileData.confirmPassword) {
+          setSnackbarMessage('Las contraseñas nuevas no coinciden');
+          setSnackbarOpen(true);
+          return;
+        }
+        if (profileData.newPassword.length < 6) {
+          setSnackbarMessage('La nueva contraseña debe tener al menos 6 caracteres');
+          setSnackbarOpen(true);
+          return;
+        }
+      }
+
       const response = await fetch('http://localhost:3001/api/update-profile', {
         method: 'PUT',
         headers: {
@@ -194,19 +236,33 @@ function App() {
         },
         body: JSON.stringify({
           userId: user.id,
-          ...profileData
+          name: profileData.name,
+          email: profileData.email,
+          docType: profileData.docType,
+          docValue: profileData.docValue,
+          ...(profileData.newPassword && {
+            currentPassword: profileData.currentPassword,
+            newPassword: profileData.newPassword
+          })
         }),
       });
       
       const result = await response.json();
       
       if (result.success) {
-        const updatedUser = { ...user, ...profileData };
+        const updatedUser = { ...user, name: profileData.name, email: profileData.email, docType: profileData.docType, docValue: profileData.docValue };
         setUser(updatedUser);
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-        setSnackbarMessage('Perfil actualizado exitosamente');
+        setSnackbarMessage(profileData.newPassword ? 'Perfil y contraseña actualizados exitosamente' : 'Perfil actualizado exitosamente');
         setSnackbarOpen(true);
         setProfileDialogOpen(false);
+        // Limpiar campos de contraseña
+        setProfileData(prev => ({
+          ...prev,
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        }));
       } else {
         setSnackbarMessage('Error al actualizar el perfil: ' + (result.error || 'Error desconocido'));
         setSnackbarOpen(true);
@@ -759,6 +815,73 @@ function App() {
                   required
                 />
               </Grid>
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+                  <Button
+                    variant={showPasswordFields ? "contained" : "outlined"}
+                    color="secondary"
+                    onClick={() => {
+                      setShowPasswordFields(!showPasswordFields);
+                      if (showPasswordFields) {
+                        // Limpiar campos de contraseña al ocultar
+                        setProfileData(prev => ({
+                          ...prev,
+                          currentPassword: '',
+                          newPassword: '',
+                          confirmPassword: ''
+                        }));
+                      }
+                    }}
+                  >
+                    {showPasswordFields ? 'Cancelar cambio de contraseña' : 'Cambiar contraseña'}
+                  </Button>
+                </Box>
+              </Grid>
+              {showPasswordFields && (
+                <>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Contraseña actual"
+                      name="currentPassword"
+                      type="password"
+                      value={profileData.currentPassword}
+                      onChange={handleProfileDataChange}
+                      fullWidth
+                      required
+                      helperText="Ingrese su contraseña actual para confirmar el cambio"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Nueva contraseña"
+                      name="newPassword"
+                      type="password"
+                      value={profileData.newPassword}
+                      onChange={handleProfileDataChange}
+                      fullWidth
+                      required
+                      helperText="Mínimo 6 caracteres"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Confirmar nueva contraseña"
+                      name="confirmPassword"
+                      type="password"
+                      value={profileData.confirmPassword}
+                      onChange={handleProfileDataChange}
+                      fullWidth
+                      required
+                      error={profileData.confirmPassword && profileData.newPassword !== profileData.confirmPassword}
+                      helperText={
+                        profileData.confirmPassword && profileData.newPassword !== profileData.confirmPassword
+                          ? "Las contraseñas no coinciden"
+                          : "Repita la nueva contraseña"
+                      }
+                    />
+                  </Grid>
+                </>
+              )}
             </Grid>
           </Box>
         </DialogContent>
