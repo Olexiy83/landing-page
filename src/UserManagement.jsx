@@ -179,38 +179,51 @@ function UserManagement({ onBack, user }) {
   }
 
   return (
-    <Box sx={{ width: '100%', minHeight: '100vh', bgcolor: '#f5f6fa' }}>
-      {/* AppBar */}
-      <AppBar position="static" color="primary" elevation={2}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="volver"
-            onClick={onBack}
-            sx={{ mr: 2 }}
-          >
-            <ArrowBack />
-          </IconButton>
-          <AdminPanelSettings sx={{ mr: 1 }} />
-          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
-            Administración de Usuarios
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-            Sesión: {user.name}
-          </Typography>
+    <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: '#f5f6fa', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {/* AppBar superior igual a la de login */}
+      <AppBar position="static" color="primary" elevation={2} sx={{ width: '100vw', borderRadius: 0 }}>
+        <Toolbar sx={{ 
+          width: '100%', 
+          minHeight: 72, 
+          maxWidth: '100vw', 
+          mx: 'auto', 
+          px: 4, 
+          display: 'flex', 
+          alignItems: 'center'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="volver"
+              onClick={onBack}
+              sx={{ mr: 2 }}
+            >
+              <ArrowBack />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700, mr: 2 }}>
+              Librería
+            </Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, ml: 2 }}>
+            <AdminPanelSettings sx={{ mr: 1 }} />
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Administración de Usuarios
+            </Typography>
+          </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Main Content */}
-      <Box sx={{ p: 3, maxWidth: '1200px', mx: 'auto' }}>
+      {/* Main Content - Centrado como en la página de login */}
+      <Box sx={{ mt: 4, width: '90%', maxWidth: '1200px' }}>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
         )}
 
-        <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
+        <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Typography variant="h5" sx={{ fontWeight: 600, color: '#333' }}>
               Lista de Usuarios ({users.length})
