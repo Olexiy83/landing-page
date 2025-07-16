@@ -284,7 +284,7 @@ function ContactForm({ onBack, cart = [], cartOpen = false, setCartOpen = () => 
       <Box sx={{ maxWidth: 1200, width: '100%', mx: 'auto', px: 3, py: 6, mt: -4, position: 'relative' }}>
         <Grid container spacing={4}>
           {/* Información de contacto */}
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <Paper sx={{ 
               p: 4, 
               height: 'fit-content',
@@ -452,7 +452,7 @@ function ContactForm({ onBack, cart = [], cartOpen = false, setCartOpen = () => 
           </Grid>
 
           {/* Formulario de contacto */}
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={9}>
             <Paper sx={{ 
               p: 5, 
               borderRadius: 4,
@@ -638,7 +638,7 @@ function ContactForm({ onBack, cart = [], cartOpen = false, setCartOpen = () => 
                         fullWidth
                         required
                         multiline
-                        rows={6}
+                        rows={10}
                         error={!!errors.message}
                         helperText={errors.message || 'Mínimo 10 caracteres'}
                         variant="outlined"
@@ -668,7 +668,7 @@ function ContactForm({ onBack, cart = [], cartOpen = false, setCartOpen = () => 
                         display: 'flex', 
                         justifyContent: 'center', 
                         alignItems: 'center',
-                        mt: 4,
+                        mt: 2,
                         mb: 2
                       }}>
                         <Button
@@ -703,13 +703,13 @@ function ContactForm({ onBack, cart = [], cartOpen = false, setCartOpen = () => 
                       
                       <Typography variant="body2" color="text.secondary" sx={{ 
                         textAlign: 'center',
-                        mt: 3,
+                        mt: 2,
                         fontStyle: 'italic'
                       }}>
                         Te responderemos en un plazo máximo de 24 horas a través de olexiygrytsenko@gmail.com
                       </Typography>
                       
-                      <Box sx={{ textAlign: 'center', mt: 2 }}>
+                      <Box sx={{ textAlign: 'center', mt: 1 }}>
                         <Button 
                           variant="outlined" 
                           size="small"
