@@ -508,6 +508,55 @@ function ProductManagement({ onBack, user }) {
                   fullWidth
                   helperText="URL de la imagen del libro"
                 />
+                {/* Vista previa de imagen debajo */}
+                {productForm.image && (
+                  <Box sx={{ 
+                    mt: 2, 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center',
+                    border: '1px solid #ddd',
+                    borderRadius: 1,
+                    p: 2,
+                    bgcolor: '#f9f9f9'
+                  }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1, color: '#666', textAlign: 'center' }}>
+                      Vista previa de la imagen:
+                    </Typography>
+                    <Box
+                      component="img"
+                      src={productForm.image}
+                      alt="Vista previa"
+                      sx={{
+                        maxWidth: '200px',
+                        maxHeight: '250px',
+                        objectFit: 'cover',
+                        borderRadius: 1,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                      onLoad={(e) => {
+                        e.target.style.display = 'block';
+                        e.target.nextSibling.style.display = 'none';
+                      }}
+                    />
+                    <Box sx={{ 
+                      display: 'none', 
+                      flexDirection: 'column', 
+                      alignItems: 'center',
+                      color: '#999',
+                      mt: 1
+                    }}>
+                      <ImageIcon sx={{ fontSize: 40, mb: 1 }} />
+                      <Typography variant="caption">
+                        No se pudo cargar la imagen
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
               </Grid>
             </Grid>
           </Box>
@@ -598,6 +647,55 @@ function ProductManagement({ onBack, user }) {
                   fullWidth
                   helperText="URL de la imagen del libro"
                 />
+                {/* Vista previa de imagen debajo */}
+                {productForm.image && (
+                  <Box sx={{ 
+                    mt: 2, 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center',
+                    border: '1px solid #ddd',
+                    borderRadius: 1,
+                    p: 2,
+                    bgcolor: '#f9f9f9'
+                  }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1, color: '#666', textAlign: 'center' }}>
+                      Vista previa de la imagen:
+                    </Typography>
+                    <Box
+                      component="img"
+                      src={productForm.image}
+                      alt="Vista previa"
+                      sx={{
+                        maxWidth: '200px',
+                        maxHeight: '250px',
+                        objectFit: 'cover',
+                        borderRadius: 1,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                      onLoad={(e) => {
+                        e.target.style.display = 'block';
+                        e.target.nextSibling.style.display = 'none';
+                      }}
+                    />
+                    <Box sx={{ 
+                      display: 'none', 
+                      flexDirection: 'column', 
+                      alignItems: 'center',
+                      color: '#999',
+                      mt: 1
+                    }}>
+                      <ImageIcon sx={{ fontSize: 40, mb: 1 }} />
+                      <Typography variant="caption">
+                        No se pudo cargar la imagen
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
               </Grid>
             </Grid>
           </Box>
