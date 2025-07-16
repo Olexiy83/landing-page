@@ -62,6 +62,8 @@ function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [booksMenuAnchor, setBooksMenuAnchor] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [profileData, setProfileData] = useState({
     name: '',
     email: '',
@@ -71,6 +73,46 @@ function App() {
     newPassword: '',
     confirmPassword: ''
   });
+
+  // Categorías disponibles para el menú de libros
+  const categories = [
+    'Artes',
+    'Bibliotecología y museología',
+    'Ciencias de la Tierra',
+    'Ciencias y matemáticas',
+    'Computación y tecnología de la información',
+    'Deportes y actividades al aire libre',
+    'Derecho',
+    'Economía, finanzas, empresa y gestión',
+    'Ficción',
+    'Filosofía y religión',
+    'Historia y arqueología',
+    'Infantil y Juvenil',
+    'Lenguaje y lingüística',
+    'Literatura, estudios literarios y biografías',
+    'Medicina y salud',
+    'Narrativas ilustradas'
+  ];
+
+  // Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+
+  // Handlers for books dropdown menu
+  const handleBooksMenuOpen = (event) => {
+    setBooksMenuAnchor(event.currentTarget);
+  };
+
+  const handleBooksMenuClose = () => {
+    setBooksMenuAnchor(null);
+  };
+
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    handleBooksMenuClose();
+    // Filter products by category
+    // You can add filtering logic here if needed
+  };
 
   // Check for saved user data on component mount
   useEffect(() => {
@@ -329,9 +371,11 @@ function App() {
     setSnackbarOpen(true);
   };
 
-  let filteredProducts = products.filter(
-    (p) => p.title.toLowerCase().includes(search.toLowerCase())
-  );
+  let filteredProducts = products.filter((p) => {
+    const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = selectedCategory === '' || p.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   // Ordenar según la opción seleccionada
   if (sortOption === 'nombre') {
@@ -341,31 +385,6 @@ function App() {
   } else if (sortOption === 'precio') {
     filteredProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
   }
-
-  // Categorías para el sidebar
-  const categories = [
-    'Artes',
-    'Bibliotecología y museología',
-    'Ciencias de la Tierra',
-    'Ciencias y matemáticas',
-    'Computación y tecnología de la información',
-    'Deportes y actividades al aire libre',
-    'Derecho',
-    'Economía, finanzas, empresa y gestión',
-    'Ficción',
-    'Filosofía y religión',
-    'Historia y arqueología',
-    'Infantil y Juvenil',
-    'Lenguaje y lingüística',
-    'Literatura, estudios literarios y biografías',
-    'Medicina y salud',
-    'Narrativas ilustradas',
-  ];
-
-  // Drawer para carrito
-  const [cartOpen, setCartOpen] = useState(false);
-  // Drawer para menú lateral en mobile
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   if (showLogin) {
     return (
@@ -434,7 +453,13 @@ function App() {
             </Search>
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}>
-            <Button color="inherit">Libros</Button>
+            <Button 
+              color="inherit" 
+              onClick={handleBooksMenuOpen}
+              endIcon={<KeyboardArrowDown />}
+            >
+              Libros
+            </Button>
             <Button color="inherit">Catálogo</Button>
             <Button color="inherit">Novedades</Button>
             {/* <Button color="inherit">Ficción</Button> */}
@@ -539,6 +564,36 @@ function App() {
         </Toolbar>
       </AppBar>
 
+      {/* Menu desplegable para Libros */}
+      <Menu
+        anchorEl={booksMenuAnchor}
+        open={Boolean(booksMenuAnchor)}
+        onClose={handleBooksMenuClose}
+        MenuListProps={{
+          'aria-labelledby': 'books-button',
+        }}
+        PaperProps={{
+          sx: {
+            maxHeight: 400,
+            minWidth: 280,
+          }
+        }}
+      >
+        <MenuItem onClick={() => handleCategorySelect('')} sx={{ fontWeight: selectedCategory === '' ? 600 : 400 }}>
+          Todas las categorías
+        </MenuItem>
+        <Divider />
+        {categories.map((category) => (
+          <MenuItem 
+            key={category} 
+            onClick={() => handleCategorySelect(category)}
+            sx={{ fontWeight: selectedCategory === category ? 600 : 400 }}
+          >
+            {category}
+          </MenuItem>
+        ))}
+      </Menu>
+
       {/* Drawer lateral para mobile */}
       <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
         <Box sx={{ width: 250 }} role="presentation" onClick={() => setDrawerOpen(false)}>
@@ -555,7 +610,7 @@ function App() {
       {/* Layout principal */}
       <Grid container spacing={2} sx={{ p: 3, width: 1100, mx: 'auto' }}>
         <Grid item xs={12} sm={12} md={12}>
-          <Box sx={{ mb: 2, width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+          <Box sx={{ mb: 2, width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Select
               value={sortOption}
               onChange={e => setSortOption(e.target.value)}
@@ -567,6 +622,24 @@ function App() {
               <MenuItem value="autor">Ordenar por autor</MenuItem>
               <MenuItem value="precio">Ordenar por el precio</MenuItem>
             </Select>
+            {selectedCategory && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Categoría:
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  {selectedCategory}
+                </Typography>
+                <Button 
+                  size="small" 
+                  variant="outlined" 
+                  onClick={() => handleCategorySelect('')}
+                  sx={{ ml: 1 }}
+                >
+                  Limpiar filtro
+                </Button>
+              </Box>
+            )}
           </Box>
           <Grid container spacing={2} justifyContent="center" alignItems="center">
             {loading ? (
