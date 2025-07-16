@@ -141,6 +141,98 @@ def update_user_profile(update_data):
         conn.close()
         print(json.dumps({"success": False, "error": str(e)}))
 
+def get_all_users():
+    """Get all users (Admin function)"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    try:
+        c.execute('SELECT id, name, email, doc_type, doc_value, created_at FROM users ORDER BY id')
+        users = []
+        for row in c.fetchall():
+            users.append({
+                "id": row[0],
+                "name": row[1],
+                "email": row[2],
+                "docType": row[3],
+                "docValue": row[4],
+                "created_at": row[5]
+            })
+        conn.close()
+        print(json.dumps(users))
+    except Exception as e:
+        conn.close()
+        print(json.dumps({"error": str(e)}))
+
+def update_user_admin(update_data):
+    """Update user by admin"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    try:
+        user_id = update_data['userId']
+        
+        # Check if email already exists for other users
+        if 'email' in update_data:
+            c.execute('SELECT id FROM users WHERE email = ? AND id != ?', 
+                     (update_data['email'], user_id))
+            if c.fetchone():
+                conn.close()
+                print(json.dumps({"success": False, "error": "Email already in use by another user"}))
+                return
+        
+        # Update user data
+        update_fields = []
+        update_values = []
+        
+        if 'name' in update_data:
+            update_fields.append('name = ?')
+            update_values.append(update_data['name'])
+        if 'email' in update_data:
+            update_fields.append('email = ?')
+            update_values.append(update_data['email'])
+        if 'docType' in update_data:
+            update_fields.append('doc_type = ?')
+            update_values.append(update_data['docType'])
+        if 'docValue' in update_data:
+            update_fields.append('doc_value = ?')
+            update_values.append(update_data['docValue'])
+        
+        if update_fields:
+            update_values.append(user_id)
+            query = f"UPDATE users SET {', '.join(update_fields)} WHERE id = ?"
+            c.execute(query, update_values)
+            conn.commit()
+        
+        conn.close()
+        print(json.dumps({"success": True, "message": "User updated successfully"}))
+    except Exception as e:
+        conn.close()
+        print(json.dumps({"success": False, "error": str(e)}))
+
+def delete_user(user_id):
+    """Delete user by ID"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    try:
+        # Check if user exists
+        c.execute('SELECT id FROM users WHERE id = ?', (user_id,))
+        if not c.fetchone():
+            conn.close()
+            print(json.dumps({"success": False, "error": "User not found"}))
+            return
+        
+        # Delete user
+        c.execute('DELETE FROM users WHERE id = ?', (user_id,))
+        conn.commit()
+        conn.close()
+        
+        print(json.dumps({"success": True, "message": "User deleted successfully"}))
+    except Exception as e:
+        conn.close()
+        print(json.dumps({"success": False, "error": str(e)}))
+
 def get_products():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -196,6 +288,17 @@ def main():
     elif cmd == 'update_profile':
         update_data = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
         update_user_profile(update_data)
+    elif cmd == 'get_users':
+        get_all_users()
+    elif cmd == 'update_user_admin':
+        update_data = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
+        update_user_admin(update_data)
+    elif cmd == 'delete_user':
+        user_id = sys.argv[2] if len(sys.argv) > 2 else None
+        if user_id:
+            delete_user(user_id)
+        else:
+            print(json.dumps({"error": "User ID required"}))
     else:
         print(json.dumps({"error": "Unknown command"}))
 

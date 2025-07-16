@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import LoginRegisterPage from './LoginRegisterPage';
+import UserManagement from './UserManagement';
 import {
   AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress
 } from '@mui/material';
@@ -49,6 +50,7 @@ function App() {
   const [search, setSearch] = useState('');
   const [sortOption, setSortOption] = useState('popularidad');
   const [showLogin, setShowLogin] = useState(false);
+  const [showUserManagement, setShowUserManagement] = useState(false);
   const [user, setUser] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -324,6 +326,15 @@ function App() {
     );
   }
 
+  if (showUserManagement) {
+    return (
+      <UserManagement
+        onBack={() => setShowUserManagement(false)}
+        user={user}
+      />
+    );
+  }
+
   return (
     <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: '#f5f6fa', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {/* AppBar superior */}
@@ -426,6 +437,18 @@ function App() {
                     <Person sx={{ mr: 1 }} />
                     Perfil de usuario
                   </MenuItem>
+                  {user?.email === 'admin' && (
+                    <>
+                      <Divider />
+                      <MenuItem onClick={() => {
+                        handleUserMenuClose();
+                        setShowUserManagement(true);
+                      }}>
+                        <Person sx={{ mr: 1 }} />
+                        Administrar usuarios
+                      </MenuItem>
+                    </>
+                  )}
                   <Divider />
                   <MenuItem onClick={handleLogout}>
                     <ExitToApp sx={{ mr: 1 }} />

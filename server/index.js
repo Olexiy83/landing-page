@@ -57,6 +57,54 @@ app.put('/api/update-profile', (req, res) => {
   });
 });
 
+// Get all users endpoint (Admin only)
+app.get('/api/users', (req, res) => {
+  console.log('Get all users endpoint called');
+  const py = spawn('python3', ['python-backend/app.py', 'get_users']);
+  let data = '';
+  py.stdout.on('data', (chunk) => (data += chunk));
+  py.on('close', () => {
+    try {
+      console.log('Python response for users:', data);
+      res.json(JSON.parse(data));
+    } catch {
+      res.status(500).json({ error: 'Error processing users request' });
+    }
+  });
+});
+
+// Update user by admin endpoint
+app.put('/api/update-user', (req, res) => {
+  console.log('Update user by admin endpoint called with:', req.body);
+  const py = spawn('python3', ['python-backend/app.py', 'update_user_admin', JSON.stringify(req.body)]);
+  let data = '';
+  py.stdout.on('data', (chunk) => (data += chunk));
+  py.on('close', () => {
+    try {
+      console.log('Python response:', data);
+      res.json(JSON.parse(data));
+    } catch {
+      res.status(500).json({ error: 'Error processing user update' });
+    }
+  });
+});
+
+// Delete user endpoint
+app.delete('/api/delete-user/:userId', (req, res) => {
+  console.log('Delete user endpoint called for user ID:', req.params.userId);
+  const py = spawn('python3', ['python-backend/app.py', 'delete_user', req.params.userId]);
+  let data = '';
+  py.stdout.on('data', (chunk) => (data += chunk));
+  py.on('close', () => {
+    try {
+      console.log('Python response:', data);
+      res.json(JSON.parse(data));
+    } catch {
+      res.status(500).json({ error: 'Error processing user deletion' });
+    }
+  });
+});
+
 // Get products from Python backend
 app.get('/api/products', (req, res) => {
   console.log('Products endpoint called');
@@ -104,4 +152,7 @@ app.listen(PORT, () => {
   console.log('POST /api/login'); 
   console.log('PUT /api/update-profile');
   console.log('GET /api/products');
+  console.log('GET /api/users');
+  console.log('PUT /api/update-user');
+  console.log('DELETE /api/delete-user/:userId');
 });
