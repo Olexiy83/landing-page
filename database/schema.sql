@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS books (
     title TEXT NOT NULL,
     author TEXT NOT NULL,
     price REAL NOT NULL,
-    image_url TEXT
+    image_url TEXT,
+    category TEXT
 );
 
 CREATE TABLE IF NOT EXISTS users (

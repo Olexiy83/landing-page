@@ -121,6 +121,55 @@ app.get('/api/products', (req, res) => {
   });
 });
 
+// Add product endpoint
+app.post('/api/products', (req, res) => {
+  console.log('Add product endpoint called with:', req.body);
+  const py = spawn('python3', ['python-backend/app.py', 'add_product', JSON.stringify(req.body)]);
+  let data = '';
+  py.stdout.on('data', (chunk) => (data += chunk));
+  py.on('close', () => {
+    try {
+      console.log('Python response:', data);
+      res.json(JSON.parse(data));
+    } catch {
+      res.status(500).json({ error: 'Error processing product addition' });
+    }
+  });
+});
+
+// Update product endpoint
+app.put('/api/products/:productId', (req, res) => {
+  console.log('Update product endpoint called for product ID:', req.params.productId, 'with:', req.body);
+  const requestData = { ...req.body, productId: req.params.productId };
+  const py = spawn('python3', ['python-backend/app.py', 'update_product', JSON.stringify(requestData)]);
+  let data = '';
+  py.stdout.on('data', (chunk) => (data += chunk));
+  py.on('close', () => {
+    try {
+      console.log('Python response:', data);
+      res.json(JSON.parse(data));
+    } catch {
+      res.status(500).json({ error: 'Error processing product update' });
+    }
+  });
+});
+
+// Delete product endpoint
+app.delete('/api/products/:productId', (req, res) => {
+  console.log('Delete product endpoint called for product ID:', req.params.productId);
+  const py = spawn('python3', ['python-backend/app.py', 'delete_product', req.params.productId]);
+  let data = '';
+  py.stdout.on('data', (chunk) => (data += chunk));
+  py.on('close', () => {
+    try {
+      console.log('Python response:', data);
+      res.json(JSON.parse(data));
+    } catch {
+      res.status(500).json({ error: 'Error processing product deletion' });
+    }
+  });
+});
+
 // Cart endpoints (add, remove, get)
 app.post('/api/cart', (req, res) => {
   const py = spawn('python3', ['../python-backend/app.py', 'add_cart', JSON.stringify(req.body)]);
@@ -152,6 +201,9 @@ app.listen(PORT, () => {
   console.log('POST /api/login'); 
   console.log('PUT /api/update-profile');
   console.log('GET /api/products');
+  console.log('POST /api/products');
+  console.log('PUT /api/products/:productId');
+  console.log('DELETE /api/products/:productId');
   console.log('GET /api/users');
   console.log('PUT /api/update-user');
   console.log('DELETE /api/delete-user/:userId');

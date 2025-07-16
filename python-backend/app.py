@@ -250,12 +250,115 @@ def delete_user(user_id):
 def get_products():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute('SELECT id, title, author, price, image_url FROM books')
+    c.execute('SELECT id, title, author, price, image_url, category FROM books')
     books = [
-        {"id": row[0], "title": row[1], "author": row[2], "price": row[3], "image": row[4]} for row in c.fetchall()
+        {"id": row[0], "title": row[1], "author": row[2], "price": row[3], "image": row[4], "category": row[5]} for row in c.fetchall()
     ]
     conn.close()
     print(json.dumps(books))
+
+def add_product(product_data):
+    """Add a new product"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    try:
+        # Insert new product
+        c.execute('''
+            INSERT INTO books (title, author, price, image_url, category) 
+            VALUES (?, ?, ?, ?, ?)
+        ''', (product_data['title'], product_data['author'], 
+              product_data['price'], product_data.get('image', ''),
+              product_data.get('category', '')))
+        
+        product_id = c.lastrowid
+        conn.commit()
+        conn.close()
+        
+        print(json.dumps({
+            "success": True, 
+            "product": {
+                "id": product_id,
+                "title": product_data['title'],
+                "author": product_data['author'],
+                "price": product_data['price'],
+                "image": product_data.get('image', ''),
+                "category": product_data.get('category', '')
+            }
+        }))
+    except Exception as e:
+        conn.close()
+        print(json.dumps({"success": False, "error": str(e)}))
+
+def update_product(update_data):
+    """Update product by ID"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    try:
+        product_id = update_data['productId']
+        
+        # Check if product exists
+        c.execute('SELECT id FROM books WHERE id = ?', (product_id,))
+        if not c.fetchone():
+            conn.close()
+            print(json.dumps({"success": False, "error": "Product not found"}))
+            return
+        
+        # Update product data
+        update_fields = []
+        update_values = []
+        
+        if 'title' in update_data:
+            update_fields.append('title = ?')
+            update_values.append(update_data['title'])
+        if 'author' in update_data:
+            update_fields.append('author = ?')
+            update_values.append(update_data['author'])
+        if 'price' in update_data:
+            update_fields.append('price = ?')
+            update_values.append(update_data['price'])
+        if 'image' in update_data:
+            update_fields.append('image_url = ?')
+            update_values.append(update_data['image'])
+        if 'category' in update_data:
+            update_fields.append('category = ?')
+            update_values.append(update_data['category'])
+        
+        if update_fields:
+            update_values.append(product_id)
+            query = f"UPDATE books SET {', '.join(update_fields)} WHERE id = ?"
+            c.execute(query, update_values)
+            conn.commit()
+        
+        conn.close()
+        print(json.dumps({"success": True, "message": "Product updated successfully"}))
+    except Exception as e:
+        conn.close()
+        print(json.dumps({"success": False, "error": str(e)}))
+
+def delete_product(product_id):
+    """Delete product by ID"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    try:
+        # Check if product exists
+        c.execute('SELECT id FROM books WHERE id = ?', (product_id,))
+        if not c.fetchone():
+            conn.close()
+            print(json.dumps({"success": False, "error": "Product not found"}))
+            return
+        
+        # Delete product
+        c.execute('DELETE FROM books WHERE id = ?', (product_id,))
+        conn.commit()
+        conn.close()
+        
+        print(json.dumps({"success": True, "message": "Product deleted successfully"}))
+    except Exception as e:
+        conn.close()
+        print(json.dumps({"success": False, "error": str(e)}))
 
 def add_cart(item):
     conn = sqlite3.connect(DB_PATH)
@@ -288,6 +391,18 @@ def main():
     cmd = sys.argv[1]
     if cmd == 'products':
         get_products()
+    elif cmd == 'add_product':
+        product_data = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
+        add_product(product_data)
+    elif cmd == 'update_product':
+        update_data = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
+        update_product(update_data)
+    elif cmd == 'delete_product':
+        product_id = sys.argv[2] if len(sys.argv) > 2 else None
+        if product_id:
+            delete_product(product_id)
+        else:
+            print(json.dumps({"error": "Product ID required"}))
     elif cmd == 'add_cart':
         item = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
         add_cart(item)

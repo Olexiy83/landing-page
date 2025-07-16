@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import LoginRegisterPage from './LoginRegisterPage';
 import UserManagement from './UserManagement';
+import ProductManagement from './ProductManagement';
 import {
   AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress
 } from '@mui/material';
@@ -51,6 +52,7 @@ function App() {
   const [sortOption, setSortOption] = useState('popularidad');
   const [showLogin, setShowLogin] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
+  const [showProductManagement, setShowProductManagement] = useState(false);
   const [user, setUser] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -391,6 +393,15 @@ function App() {
     );
   }
 
+  if (showProductManagement) {
+    return (
+      <ProductManagement
+        onBack={() => setShowProductManagement(false)}
+        user={user}
+      />
+    );
+  }
+
   return (
     <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: '#f5f6fa', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {/* AppBar superior */}
@@ -505,8 +516,7 @@ function App() {
                       </MenuItem>
                       <MenuItem onClick={() => {
                         handleUserMenuClose();
-                        // TODO: Implementar administración de productos
-                        alert('Función "Administrar productos" en desarrollo');
+                        setShowProductManagement(true);
                       }}>
                         <Inventory sx={{ mr: 1 }} />
                         Administrar productos
