@@ -1,6 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// Obtener el directorio actual del servidor
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Configurar rutas relativas
+const PYTHON_SCRIPT_PATH = process.env.PYTHON_SCRIPT_PATH || join(__dirname, '..', 'python-backend', 'app.py');
+const PYTHON_EXECUTABLE = process.env.PYTHON_EXECUTABLE || 'python3';
 
 const app = express();
 app.use(cors());
@@ -30,21 +40,54 @@ const log = {
   }
 };
 
+// Función helper para ejecutar scripts de Python
+const executePythonScript = (command, args = [], callback) => {
+  const scriptArgs = [PYTHON_SCRIPT_PATH, command];
+  if (args.length > 0) {
+    scriptArgs.push(...args);
+  }
+  
+  log.debug(`Executing: ${PYTHON_EXECUTABLE} ${scriptArgs.join(' ')}`);
+  const py = spawn(PYTHON_EXECUTABLE, scriptArgs);
+  
+  let data = '';
+  let errorData = '';
+  
+  py.stdout.on('data', (chunk) => (data += chunk));
+  py.stderr.on('data', (chunk) => (errorData += chunk));
+  
+  py.on('close', (code) => {
+    if (code !== 0) {
+      log.error(`Python script exited with code ${code}. Error: ${errorData}`);
+      callback(new Error(`Python script failed: ${errorData}`), null);
+    } else {
+      try {
+        log.debug('Python response:', data);
+        callback(null, JSON.parse(data));
+      } catch (parseError) {
+        log.error('Error parsing Python response:', parseError);
+        callback(new Error('Invalid JSON response from Python script'), null);
+      }
+    }
+  });
+  
+  py.on('error', (error) => {
+    log.error('Error spawning Python process:', error);
+    callback(error, null);
+  });
+};
+
 log.info('Setting up routes...');
 
 // User registration endpoint
 app.post('/api/register', (req, res) => {
   log.debug('Register endpoint called with:', req.body);
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'register', JSON.stringify(req.body)]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error processing registration');
+  executePythonScript('register', [JSON.stringify(req.body)], (error, result) => {
+    if (error) {
+      log.error('Error processing registration:', error.message);
       res.status(500).json({ error: 'Error processing registration' });
+    } else {
+      res.json(result);
     }
   });
 });
@@ -52,16 +95,12 @@ app.post('/api/register', (req, res) => {
 // User login endpoint
 app.post('/api/login', (req, res) => {
   log.debug('Login endpoint called with:', req.body);
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'login', JSON.stringify(req.body)]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error processing login');
+  executePythonScript('login', [JSON.stringify(req.body)], (error, result) => {
+    if (error) {
+      log.error('Error processing login:', error.message);
       res.status(500).json({ error: 'Error processing login' });
+    } else {
+      res.json(result);
     }
   });
 });
@@ -69,16 +108,12 @@ app.post('/api/login', (req, res) => {
 // Update user profile endpoint
 app.put('/api/update-profile', (req, res) => {
   log.debug('Update profile endpoint called with:', req.body);
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'update_profile', JSON.stringify(req.body)]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error processing profile update');
+  executePythonScript('update_profile', [JSON.stringify(req.body)], (error, result) => {
+    if (error) {
+      log.error('Error processing profile update:', error.message);
       res.status(500).json({ error: 'Error processing profile update' });
+    } else {
+      res.json(result);
     }
   });
 });
@@ -86,16 +121,12 @@ app.put('/api/update-profile', (req, res) => {
 // Get all users endpoint (Admin only)
 app.get('/api/users', (req, res) => {
   log.debug('Get all users endpoint called');
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'get_users']);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response for users:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error processing users request');
+  executePythonScript('get_users', [], (error, result) => {
+    if (error) {
+      log.error('Error processing users request:', error.message);
       res.status(500).json({ error: 'Error processing users request' });
+    } else {
+      res.json(result);
     }
   });
 });
@@ -103,16 +134,12 @@ app.get('/api/users', (req, res) => {
 // Update user by admin endpoint
 app.put('/api/update-user', (req, res) => {
   log.debug('Update user by admin endpoint called with:', req.body);
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'update_user_admin', JSON.stringify(req.body)]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error processing user update');
+  executePythonScript('update_user_admin', [JSON.stringify(req.body)], (error, result) => {
+    if (error) {
+      log.error('Error processing user update:', error.message);
       res.status(500).json({ error: 'Error processing user update' });
+    } else {
+      res.json(result);
     }
   });
 });
@@ -120,16 +147,12 @@ app.put('/api/update-user', (req, res) => {
 // Delete user endpoint
 app.delete('/api/delete-user/:userId', (req, res) => {
   log.debug('Delete user endpoint called for user ID:', req.params.userId);
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'delete_user', req.params.userId]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error processing user deletion');
+  executePythonScript('delete_user', [req.params.userId], (error, result) => {
+    if (error) {
+      log.error('Error processing user deletion:', error.message);
       res.status(500).json({ error: 'Error processing user deletion' });
+    } else {
+      res.json(result);
     }
   });
 });
@@ -137,16 +160,12 @@ app.delete('/api/delete-user/:userId', (req, res) => {
 // Get products from Python backend
 app.get('/api/products', (req, res) => {
   log.debug('Products endpoint called');
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'products']);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response for products:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error parsing products');
+  executePythonScript('products', [], (error, result) => {
+    if (error) {
+      log.error('Error parsing products:', error.message);
       res.status(500).json({ error: 'Error parsing products' });
+    } else {
+      res.json(result);
     }
   });
 });
@@ -154,16 +173,12 @@ app.get('/api/products', (req, res) => {
 // Add product endpoint
 app.post('/api/products', (req, res) => {
   log.debug('Add product endpoint called with:', req.body);
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'add_product', JSON.stringify(req.body)]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error processing product addition');
+  executePythonScript('add_product', [JSON.stringify(req.body)], (error, result) => {
+    if (error) {
+      log.error('Error processing product addition:', error.message);
       res.status(500).json({ error: 'Error processing product addition' });
+    } else {
+      res.json(result);
     }
   });
 });
@@ -172,16 +187,12 @@ app.post('/api/products', (req, res) => {
 app.put('/api/products/:productId', (req, res) => {
   log.debug('Update product endpoint called for product ID:', req.params.productId, 'with:', req.body);
   const requestData = { ...req.body, productId: req.params.productId };
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'update_product', JSON.stringify(requestData)]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error processing product update');
+  executePythonScript('update_product', [JSON.stringify(requestData)], (error, result) => {
+    if (error) {
+      log.error('Error processing product update:', error.message);
       res.status(500).json({ error: 'Error processing product update' });
+    } else {
+      res.json(result);
     }
   });
 });
@@ -189,39 +200,33 @@ app.put('/api/products/:productId', (req, res) => {
 // Delete product endpoint
 app.delete('/api/products/:productId', (req, res) => {
   log.debug('Delete product endpoint called for product ID:', req.params.productId);
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'delete_product', req.params.productId]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error processing product deletion');
+  executePythonScript('delete_product', [req.params.productId], (error, result) => {
+    if (error) {
+      log.error('Error processing product deletion:', error.message);
       res.status(500).json({ error: 'Error processing product deletion' });
+    } else {
+      res.json(result);
     }
   });
 });
 
 // Cart endpoints (add, remove, get)
 app.post('/api/cart', (req, res) => {
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'add_cart', JSON.stringify(req.body)]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    res.json({ success: true, data });
+  executePythonScript('add_cart', [JSON.stringify(req.body)], (error, result) => {
+    if (error) {
+      res.status(500).json({ error: 'Error adding to cart' });
+    } else {
+      res.json({ success: true, data: result });
+    }
   });
 });
 
 app.get('/api/cart', (req, res) => {
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'get_cart']);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      res.json(JSON.parse(data));
-    } catch {
+  executePythonScript('get_cart', [], (error, result) => {
+    if (error) {
       res.status(500).json({ error: 'Error parsing cart' });
+    } else {
+      res.json(result);
     }
   });
 });
@@ -229,86 +234,48 @@ app.get('/api/cart', (req, res) => {
 // Contact message endpoints
 app.post('/api/contact-message', (req, res) => {
   log.debug('Save contact message endpoint called with:', req.body);
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'save_contact_message', JSON.stringify(req.body)]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error saving contact message');
+  executePythonScript('save_contact_message', [JSON.stringify(req.body)], (error, result) => {
+    if (error) {
+      log.error('Error saving contact message:', error.message);
       res.status(500).json({ error: 'Error saving contact message' });
+    } else {
+      res.json(result);
     }
   });
 });
 
 app.get('/api/contact-messages', (req, res) => {
   log.debug('Get contact messages endpoint called');
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'get_contact_messages']);
-  let data = '';
-  let errorData = '';
-  
-  py.stdout.on('data', (chunk) => {
-    log.debug('Python stdout chunk:', chunk.toString());
-    data += chunk;
-  });
-  
-  py.stderr.on('data', (chunk) => {
-    log.debug('Python stderr chunk:', chunk.toString());
-    errorData += chunk;
-  });
-  
-  py.on('close', (code) => {
-    log.debug('Python process closed with code:', code);
-    log.debug('Python stdout data:', data);
-    log.debug('Python stderr data:', errorData);
-    
-    try {
-      if (data.trim()) {
-        const result = JSON.parse(data);
-        log.debug('Parsed Python response:', result);
-        res.json(result);
-      } else {
-        log.error('No data received from Python script');
-        res.status(500).json({ error: 'No data received from Python script' });
-      }
-    } catch (parseError) {
-      log.error('JSON parse error:', parseError);
-      log.error('Raw data:', data);
-      res.status(500).json({ error: 'Error parsing Python response' });
+  executePythonScript('get_contact_messages', [], (error, result) => {
+    if (error) {
+      log.error('Error getting contact messages:', error.message);
+      res.status(500).json({ error: 'Error getting contact messages' });
+    } else {
+      res.json(result);
     }
   });
 });
 
 app.put('/api/contact-message/:messageId/status', (req, res) => {
   log.debug('Update message status endpoint called for message ID:', req.params.messageId, 'Status:', req.body.status);
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'update_message_status', req.params.messageId, req.body.status]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error updating message status');
+  executePythonScript('update_message_status', [req.params.messageId, req.body.status], (error, result) => {
+    if (error) {
+      log.error('Error updating message status:', error.message);
       res.status(500).json({ error: 'Error updating message status' });
+    } else {
+      res.json(result);
     }
   });
 });
 
 app.delete('/api/contact-message/:messageId', (req, res) => {
   log.debug('Delete contact message endpoint called for message ID:', req.params.messageId);
-  const py = spawn('python3', ['/home/olexiy/work_directory/landing-page/python-backend/app.py', 'delete_contact_message', req.params.messageId]);
-  let data = '';
-  py.stdout.on('data', (chunk) => (data += chunk));
-  py.on('close', () => {
-    try {
-      log.debug('Python response:', data);
-      res.json(JSON.parse(data));
-    } catch {
-      log.error('Error deleting contact message');
+  executePythonScript('delete_contact_message', [req.params.messageId], (error, result) => {
+    if (error) {
+      log.error('Error deleting contact message:', error.message);
       res.status(500).json({ error: 'Error deleting contact message' });
+    } else {
+      res.json(result);
     }
   });
 });
