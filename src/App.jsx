@@ -647,109 +647,292 @@ function App() {
       </Drawer>
 
       {/* Layout principal */}
-      <Grid container spacing={2} sx={{ p: 3, width: 1100, mx: 'auto' }}>
-        <Grid item xs={12} sm={12} md={12}>
-          <Box sx={{ mb: 2, width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box sx={{ width: '100%', maxWidth: 1400, mx: 'auto', px: { xs: 2, sm: 3, md: 4 }, py: 3 }}>
+        <Paper elevation={0} sx={{ 
+          p: 3, 
+          mb: 3, 
+          borderRadius: 3, 
+          bgcolor: 'white',
+          maxWidth: 800,
+          mx: 'auto'
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            mb: 3
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                Catálogo de Libros
+              </Typography>
+              {filteredProducts.length > 0 && (
+                <Typography variant="body2" sx={{ 
+                  color: 'text.secondary',
+                  backgroundColor: '#f5f5f5',
+                  px: 2,
+                  py: 0.5,
+                  borderRadius: 2,
+                  fontWeight: 500
+                }}>
+                  {filteredProducts.length} {filteredProducts.length === 1 ? 'libro' : 'libros'}
+                </Typography>
+              )}
+            </Box>
             <Select
               value={sortOption}
               onChange={e => setSortOption(e.target.value)}
               size="small"
-              sx={{ minWidth: 180, bgcolor: 'white', borderRadius: 2 }}
-            >
-              <MenuItem value="popularidad">Ordenar por popularidad</MenuItem>
-              <MenuItem value="nombre">Ordenar por nombre</MenuItem>
-              <MenuItem value="autor">Ordenar por autor</MenuItem>
-              <MenuItem value="precio">Ordenar por el precio</MenuItem>
-            </Select>
-            {selectedCategory && (
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 2,
-                backgroundColor: '#e3f2fd',
-                padding: '8px 16px',
+              sx={{ 
+                minWidth: 250,
+                maxWidth: 300,
+                bgcolor: 'white', 
                 borderRadius: 2,
-                border: '1px solid #bbdefb'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Filtro activo:
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                    {selectedCategory}
-                  </Typography>
-                </Box>
-                <Button 
-                  size="small" 
-                  variant="contained" 
-                  color="secondary"
-                  onClick={() => handleCategorySelect('')}
-                  sx={{ 
-                    minWidth: 'auto',
-                    fontSize: '0.75rem',
-                    py: 0.5,
-                    px: 1.5,
-                    textTransform: 'none'
-                  }}
-                >
-                  ✕ Limpiar
-                </Button>
-              </Box>
-            )}
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#e0e0e0',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#3483fa',
+                  },
+                }
+              }}
+            >
+              <MenuItem value="popularidad">📈 Ordenar por popularidad</MenuItem>
+              <MenuItem value="nombre">🔤 Ordenar por nombre</MenuItem>
+              <MenuItem value="autor">👤 Ordenar por autor</MenuItem>
+              <MenuItem value="precio">💰 Ordenar por precio</MenuItem>
+            </Select>
           </Box>
-          <Grid container spacing={2} justifyContent="center" alignItems="center">
-            {loading ? (
-              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <CircularProgress size={60} />
-                  <Typography variant="h6" sx={{ mt: 2 }}>Cargando productos...</Typography>
+          
+          {/* Filtro activo */}
+          {selectedCategory && (
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 2,
+              backgroundColor: '#e3f2fd',
+              padding: '12px 20px',
+              borderRadius: 3,
+              border: '1px solid #bbdefb',
+              mb: 3,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  📚 Filtro activo:
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                  {selectedCategory}
+                </Typography>
+              </Box>
+              <Button 
+                size="small" 
+                variant="contained" 
+                color="secondary"
+                onClick={() => handleCategorySelect('')}
+                sx={{ 
+                  minWidth: 'auto',
+                  fontSize: '0.75rem',
+                  py: 0.5,
+                  px: 1.5,
+                  textTransform: 'none',
+                  borderRadius: 2
+                }}
+              >
+                ✕ Limpiar filtro
+              </Button>
+            </Box>
+          )}
+        </Paper>
+
+        {/* Grid de productos mejorado */}
+        <Box sx={{ 
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 3,
+          justifyContent: 'center',
+          alignItems: 'stretch'
+        }}>
+          {loading ? (
+            <Box sx={{ 
+              width: '100%',
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              minHeight: 400,
+              flexDirection: 'column'
+            }}>
+              <CircularProgress size={60} />
+              <Typography variant="h6" sx={{ mt: 2, color: 'text.secondary' }}>
+                Cargando productos...
+              </Typography>
+            </Box>
+          ) : error ? (
+            <Box sx={{ 
+              width: '100%',
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              minHeight: 400,
+              flexDirection: 'column',
+              textAlign: 'center'
+            }}>
+              <Typography variant="h6" color="error" sx={{ mb: 2 }}>
+                ⚠️ {error}
+              </Typography>
+              <Button 
+                variant="contained" 
+                onClick={() => window.location.reload()}
+                sx={{ borderRadius: 2 }}
+              >
+                🔄 Reintentar
+              </Button>
+            </Box>
+          ) : filteredProducts.length === 0 ? (
+            <Box sx={{ 
+              width: '100%',
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              minHeight: 400,
+              flexDirection: 'column',
+              textAlign: 'center'
+            }}>
+              <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                📖 No se encontraron productos
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Intenta ajustar tu búsqueda o filtros
+              </Typography>
+            </Box>
+          ) : (
+            filteredProducts.map((book) => (
+              <Card 
+                key={book.id} 
+                sx={{ 
+                  width: {
+                    xs: 'calc(100% - 16px)',
+                    sm: 'calc(50% - 12px)',
+                    md: 'calc(33.333% - 16px)',
+                    lg: 'calc(25% - 18px)',
+                    xl: 'calc(20% - 19.2px)'
+                  },
+                  maxWidth: 280,
+                  minWidth: 240,
+                  height: 380,
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  borderRadius: 3,
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                  transition: 'all 0.3s ease',
+                  overflow: 'hidden',
+                  bgcolor: 'white',
+                  '&:hover': {
+                    transform: 'translateY(-6px)',
+                    boxShadow: '0 8px 32px rgba(52,131,250,0.15)',
+                  }
+                }}
+              >
+                <Box sx={{ 
+                  height: 160, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  bgcolor: '#fafafa',
+                  p: 1.5
+                }}>
+                  <CardMedia
+                    component="img"
+                    image={book.image}
+                    alt={book.title}
+                    sx={{ 
+                      maxHeight: '100%',
+                      maxWidth: '100%',
+                      objectFit: 'contain',
+                      borderRadius: 1
+                    }}
+                  />
                 </Box>
-              </Grid>
-            ) : error ? (
-              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="error" sx={{ mb: 2 }}>{error}</Typography>
-                  <Button variant="contained" onClick={() => window.location.reload()}>
-                    Reintentar
+                <CardContent sx={{ 
+                  flex: 1,
+                  p: 1.5,
+                  pb: 0,
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 600, 
+                      fontSize: '0.95rem',
+                      lineHeight: 1.2,
+                      mb: 0.5,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      minHeight: '2.4em'
+                    }}
+                  >
+                    {book.title}
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ 
+                      mb: 1,
+                      fontSize: '0.85rem',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 1,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
+                    👤 {book.author}
+                  </Typography>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 700,
+                      color: 'primary.main',
+                      mb: 1.5,
+                      fontSize: '1.1rem',
+                      textAlign: 'center'
+                    }}
+                  >
+                    💰 ARS ${book.price.toLocaleString('es-AR', {minimumFractionDigits:2})}
+                  </Typography>
+                </CardContent>
+                <Box sx={{ p: 1.5, pt: 0 }}>
+                  <Button 
+                    variant="contained" 
+                    fullWidth 
+                    onClick={() => addToCart(book)}
+                    sx={{ 
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      py: 0.8,
+                      fontSize: '0.9rem',
+                      bgcolor: 'primary.main',
+                      '&:hover': {
+                        bgcolor: 'primary.dark',
+                        transform: 'scale(1.02)'
+                      }
+                    }}
+                  >
+                    🛒 Agregar al carrito
                   </Button>
                 </Box>
-              </Grid>
-            ) : filteredProducts.length === 0 ? (
-              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-                <Typography variant="h6" color="text.secondary">
-                  No se encontraron productos que coincidan con tu búsqueda.
-                </Typography>
-              </Grid>
-            ) : (
-              filteredProducts.map((book) => (
-                <Grid item xs={12} sm={6} md={4} key={book.id} sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 3, alignItems: 'center', textAlign: 'center', minWidth: 260, maxWidth: 320 }}>
-                    <CardMedia
-                      component="img"
-                      height="180"
-                      image={book.image}
-                      alt={book.title}
-                      sx={{ objectFit: 'contain', p: 1, bgcolor: '#f8f8f8', mx: 'auto' }}
-                    />
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>{book.title}</Typography>
-                      <Typography variant="body2" color="text.secondary">{book.author}</Typography>
-                      <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 700 }}>
-                        ARS ${book.price.toLocaleString('es-AR', {minimumFractionDigits:2})}
-                      </Typography>
-                    </CardContent>
-                    <CardActions sx={{ width: '100%' }}>
-                      <Button variant="contained" color="primary" fullWidth onClick={() => addToCart(book)}>
-                        Agregar al carrito
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))
-            )}
-          </Grid>
-        </Grid>
-      </Grid>
+              </Card>
+            ))
+          )}
+        </Box>
+      </Box>
 
 
       {/* Drawer para carrito (mobile) */}
