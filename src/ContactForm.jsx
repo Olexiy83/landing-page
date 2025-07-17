@@ -284,175 +284,293 @@ function ContactForm({ onBack, cart = [], cartOpen = false, setCartOpen = () => 
       <Box sx={{ maxWidth: 1200, width: '100%', mx: 'auto', px: 3, py: 6, mt: -4, position: 'relative' }}>
         <Grid container spacing={4}>
           {/* Información de contacto */}
-          <Grid item xs={12} md={3}>
-            <Paper sx={{ 
-              p: 4, 
-              height: 'fit-content',
-              borderRadius: 4,
-              boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-              border: '1px solid rgba(0,0,0,0.05)',
-              background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)'
-            }}>
-              <Box sx={{ textAlign: 'center', mb: 4 }}>
-                <Box sx={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mx: 'auto',
-                  mb: 2,
-                  boxShadow: '0 8px 25px rgba(25,118,210,0.3)'
-                }}>
-                  <Phone sx={{ color: 'white', fontSize: 40 }} />
-                </Box>
-                <Typography variant="h5" sx={{ fontWeight: 700, color: '#1a202c', mb: 1 }}>
-                  Información de contacto
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                  Múltiples formas de comunicarte con nosotros
-                </Typography>
-              </Box>
-              
-              <Box sx={{ mb: 4 }}>
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  p: 3,
-                  borderRadius: 3,
-                  bgcolor: '#f1f5f9',
-                  border: '1px solid #e2e8f0',
-                  mb: 3,
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: '#e3f2fd',
-                    borderColor: '#1976d2',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 25px rgba(25,118,210,0.15)'
-                  }
-                }}>
-                  <Box sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
-                    bgcolor: 'primary.main',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mr: 3
-                  }}>
-                    <Email sx={{ color: 'white', fontSize: 24 }} />
-                  </Box>
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1a202c' }}>
-                      Correo electrónico
-                    </Typography>
-                    <Typography variant="body2" color="primary.main" sx={{ fontWeight: 500 }}>
-                      olexiygrytsenko@gmail.com
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  p: 3,
-                  borderRadius: 3,
-                  bgcolor: '#f1f5f9',
-                  border: '1px solid #e2e8f0',
-                  mb: 3,
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: '#e3f2fd',
-                    borderColor: '#1976d2',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 25px rgba(25,118,210,0.15)'
-                  }
-                }}>
-                  <Box sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
-                    bgcolor: 'primary.main',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mr: 3
-                  }}>
-                    <Phone sx={{ color: 'white', fontSize: 24 }} />
-                  </Box>
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1a202c' }}>
-                      Teléfono
-                    </Typography>
-                    <Typography variant="body2" color="primary.main" sx={{ fontWeight: 500 }}>
-                      +54 11 1234-5678
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  p: 3,
-                  borderRadius: 3,
-                  bgcolor: '#f1f5f9',
-                  border: '1px solid #e2e8f0',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: '#e3f2fd',
-                    borderColor: '#1976d2',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 25px rgba(25,118,210,0.15)'
-                  }
-                }}>
-                  <Box sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
-                    bgcolor: 'primary.main',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mr: 3
-                  }}>
-                    <LocationOn sx={{ color: 'white', fontSize: 24 }} />
-                  </Box>
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1a202c' }}>
-                      Dirección
-                    </Typography>
-                    <Typography variant="body2" color="primary.main" sx={{ fontWeight: 500 }}>
-                      Av. Corrientes 1234<br />
-                      Buenos Aires, Argentina
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box sx={{ 
-                p: 3, 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                borderRadius: 3,
-                textAlign: 'center',
-                color: 'white'
+          <Grid item xs={12} lg={4}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: '100%' }}>
+              {/* Header de información de contacto */}
+              <Paper sx={{ 
+                p: 4, 
+                borderRadius: 4,
+                boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                border: '1px solid rgba(0,0,0,0.05)',
+                background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)'
               }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-                  📅 Horarios de atención
+                <Box sx={{ textAlign: 'center', mb: 3 }}>
+                  <Box sx={{
+                    width: 70,
+                    height: 70,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mx: 'auto',
+                    mb: 2,
+                    boxShadow: '0 8px 25px rgba(25,118,210,0.3)'
+                  }}>
+                    <Phone sx={{ color: 'white', fontSize: 32 }} />
+                  </Box>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#1a202c', mb: 1 }}>
+                    Contáctanos
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                    Estamos aquí para ayudarte
+                  </Typography>
+                </Box>
+              </Paper>
+
+              {/* Información de contacto principal */}
+              <Paper sx={{ 
+                p: 4, 
+                borderRadius: 4,
+                boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                border: '1px solid rgba(0,0,0,0.05)',
+                background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+                flex: 1
+              }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a202c', mb: 3 }}>
+                  📞 Canales de comunicación
                 </Typography>
-                <Typography variant="body2" sx={{ lineHeight: 1.8, opacity: 0.9 }}>
-                  <strong>Lunes a Viernes:</strong> 9:00 - 18:00<br />
-                  <strong>Sábados:</strong> 10:00 - 16:00<br />
-                  <strong>Domingos:</strong> Cerrado
-                </Typography>
-              </Box>
-            </Paper>
+                
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                  {/* Email */}
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'flex-start',
+                    p: 2.5,
+                    borderRadius: 3,
+                    bgcolor: 'rgba(25, 118, 210, 0.05)',
+                    border: '1px solid rgba(25, 118, 210, 0.1)',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      bgcolor: 'rgba(25, 118, 210, 0.1)',
+                      borderColor: 'rgba(25, 118, 210, 0.3)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(25,118,210,0.15)'
+                    }
+                  }}
+                  onClick={() => window.open('mailto:olexiygrytsenko@gmail.com')}
+                  >
+                    <Box sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: '50%',
+                      bgcolor: 'primary.main',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mr: 2.5,
+                      flexShrink: 0
+                    }}>
+                      <Email sx={{ color: 'white', fontSize: 20 }} />
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1a202c', mb: 0.5 }}>
+                        Email principal
+                      </Typography>
+                      <Typography variant="body2" color="primary.main" sx={{ fontWeight: 500, wordBreak: 'break-all' }}>
+                        olexiygrytsenko@gmail.com
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        Respuesta en 24-48 horas
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* Teléfono */}
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'flex-start',
+                    p: 2.5,
+                    borderRadius: 3,
+                    bgcolor: 'rgba(76, 175, 80, 0.05)',
+                    border: '1px solid rgba(76, 175, 80, 0.1)',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      bgcolor: 'rgba(76, 175, 80, 0.1)',
+                      borderColor: 'rgba(76, 175, 80, 0.3)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(76,175,80,0.15)'
+                    }
+                  }}
+                  onClick={() => window.open('tel:+541112345678')}
+                  >
+                    <Box sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: '50%',
+                      bgcolor: '#4caf50',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mr: 2.5,
+                      flexShrink: 0
+                    }}>
+                      <Phone sx={{ color: 'white', fontSize: 20 }} />
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1a202c', mb: 0.5 }}>
+                        Atención telefónica
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: '#4caf50' }}>
+                        +54 11 1234-5678
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        Lun-Vie 9:00-18:00, Sáb 10:00-16:00
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* WhatsApp */}
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'flex-start',
+                    p: 2.5,
+                    borderRadius: 3,
+                    bgcolor: 'rgba(37, 211, 102, 0.05)',
+                    border: '1px solid rgba(37, 211, 102, 0.1)',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      bgcolor: 'rgba(37, 211, 102, 0.1)',
+                      borderColor: 'rgba(37, 211, 102, 0.3)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(37,211,102,0.15)'
+                    }
+                  }}
+                  onClick={() => window.open('https://wa.me/541112345678?text=Hola,%20me%20contacto%20desde%20la%20página%20web%20de%20la%20librería')}
+                  >
+                    <Box sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: '50%',
+                      bgcolor: '#25d366',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mr: 2.5,
+                      flexShrink: 0
+                    }}>
+                      <Typography sx={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
+                        💬
+                      </Typography>
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1a202c', mb: 0.5 }}>
+                        WhatsApp
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: '#25d366' }}>
+                        +54 11 1234-5678
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        Respuesta inmediata
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* Ubicación */}
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'flex-start',
+                    p: 2.5,
+                    borderRadius: 3,
+                    bgcolor: 'rgba(156, 39, 176, 0.05)',
+                    border: '1px solid rgba(156, 39, 176, 0.1)',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      bgcolor: 'rgba(156, 39, 176, 0.1)',
+                      borderColor: 'rgba(156, 39, 176, 0.3)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(156,39,176,0.15)'
+                    }
+                  }}
+                  onClick={() => window.open('https://maps.google.com?q=Av.+Corrientes+1234,+Buenos+Aires,+Argentina')}
+                  >
+                    <Box sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: '50%',
+                      bgcolor: '#9c27b0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mr: 2.5,
+                      flexShrink: 0
+                    }}>
+                      <LocationOn sx={{ color: 'white', fontSize: 20 }} />
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1a202c', mb: 0.5 }}>
+                        Nuestra librería
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: '#9c27b0', lineHeight: 1.4 }}>
+                        Av. Corrientes 1234<br />
+                        C1043 CABA, Argentina
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        📍 Clic para ver en Google Maps
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              </Paper>
+
+              {/* Horarios de atención */}
+              <Paper sx={{ 
+                p: 4, 
+                borderRadius: 4,
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                boxShadow: '0 10px 40px rgba(102, 126, 234, 0.3)'
+              }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2.5 }}>
+                    🕒 Horarios de atención
+                  </Typography>
+                  <Box sx={{ textAlign: 'left', maxWidth: 280, mx: 'auto' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        Lunes a Viernes:
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        9:00 - 18:00
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        Sábados:
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        10:00 - 16:00
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        Domingos:
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                        Cerrado
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Typography variant="caption" sx={{ 
+                    opacity: 0.8, 
+                    display: 'block',
+                    borderTop: '1px solid rgba(255,255,255,0.2)',
+                    pt: 2,
+                    mt: 2
+                  }}>
+                    💡 También puedes enviarnos un mensaje las 24 horas
+                  </Typography>
+                </Box>
+              </Paper>
+            </Box>
           </Grid>
 
           {/* Formulario de contacto */}
-          <Grid item xs={12} md={9}>
+          <Grid item xs={12} lg={8}>
             <Paper sx={{ 
               p: 5, 
               borderRadius: 4,
@@ -701,15 +819,7 @@ function ContactForm({ onBack, cart = [], cartOpen = false, setCartOpen = () => 
                         </Button>
                       </Box>
                       
-                      <Typography variant="body2" color="text.secondary" sx={{ 
-                        textAlign: 'center',
-                        mt: 2,
-                        fontStyle: 'italic'
-                      }}>
-                        Te responderemos en un plazo máximo de 24 horas a través de olexiygrytsenko@gmail.com
-                      </Typography>
-                      
-                      <Box sx={{ textAlign: 'center', mt: 1 }}>
+                      <Box sx={{ textAlign: 'center', mt: 3 }}>
                         <Button 
                           variant="outlined" 
                           size="small"
