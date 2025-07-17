@@ -675,9 +675,6 @@ function App() {
             mb: 3
           }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                Catálogo de Libros
-              </Typography>
               {filteredProducts.length > 0 && (
                 <Typography variant="body2" sx={{ 
                   color: 'text.secondary',
