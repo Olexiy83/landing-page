@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, Button, Tabs, Tab, Paper, TextField, Grid, InputBase, IconButton, Drawer, List, ListItem, ListItemText, Divider, FormControlLabel, Checkbox, MenuItem, Badge } from '@mui/material';
-import { ShoppingCart, Add, Remove } from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, Box, Button, Tabs, Tab, Paper, TextField, Grid, InputBase, IconButton, Drawer, List, ListItem, ListItemText, Divider, FormControlLabel, Checkbox, MenuItem, Badge, InputAdornment } from '@mui/material';
+import { ShoppingCart, Add, Remove, Visibility, VisibilityOff } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 import { Menu as MenuIcon } from '@mui/icons-material';
 
@@ -59,6 +59,8 @@ function LoginRegisterPage({
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // Al cargar, si hay email recordado, lo pone en el campo
   React.useEffect(() => {
@@ -88,6 +90,8 @@ function LoginRegisterPage({
   const handleLoginChange = (e) => setLoginData({ ...loginData, [e.target.name]: e.target.value });
   const handleRegisterChange = (e) => setRegisterData({ ...registerData, [e.target.name]: e.target.value });
   const handleDocTypeChange = (e) => setRegisterData({ ...registerData, docType: e.target.value });
+  const handleToggleRegisterPasswordVisibility = () => setShowRegisterPassword(!showRegisterPassword);
+  const handleToggleLoginPasswordVisibility = () => setShowLoginPassword(!showLoginPassword);
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -220,7 +224,30 @@ function LoginRegisterPage({
                       <TextField label="Correo electrónico" name="email" value={loginData.email} onChange={handleLoginChange} fullWidth required disabled={loading} />
                     </Grid>
                     <Grid item>
-                      <TextField label="Contraseña" name="password" type="password" value={loginData.password} onChange={handleLoginChange} fullWidth required disabled={loading} />
+                      <TextField 
+                        label="Contraseña" 
+                        name="password" 
+                        type={showLoginPassword ? "text" : "password"} 
+                        value={loginData.password} 
+                        onChange={handleLoginChange} 
+                        fullWidth 
+                        required 
+                        disabled={loading}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                aria-label="toggle password visibility"
+                                onClick={handleToggleLoginPasswordVisibility}
+                                edge="end"
+                                disabled={loading}
+                              >
+                                {showLoginPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
                     </Grid>
                     <Grid item>
                       <FormControlLabel
@@ -291,7 +318,30 @@ function LoginRegisterPage({
                       <TextField label="Nombre completo" name="name" value={registerData.name} onChange={handleRegisterChange} fullWidth required disabled={loading} />
                     </Grid>
                     <Grid item>
-                      <TextField label="Contraseña" name="password" type="password" value={registerData.password} onChange={handleRegisterChange} fullWidth required disabled={loading} />
+                      <TextField 
+                        label="Contraseña" 
+                        name="password" 
+                        type={showRegisterPassword ? "text" : "password"} 
+                        value={registerData.password} 
+                        onChange={handleRegisterChange} 
+                        fullWidth 
+                        required 
+                        disabled={loading}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                aria-label="toggle password visibility"
+                                onClick={handleToggleRegisterPasswordVisibility}
+                                edge="end"
+                                disabled={loading}
+                              >
+                                {showRegisterPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
                     </Grid>
                     <Grid item>
                       <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
