@@ -56,7 +56,6 @@ function LoginRegisterPage({
   const [registerData, setRegisterData] = useState({ name: '', email: '', password: '', docType: 'DNI', docValue: '' });
   const [search, setSearch] = useState('');
   const [remember, setRemember] = useState(() => !!localStorage.getItem('rememberedEmail'));
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
@@ -153,8 +152,6 @@ function LoginRegisterPage({
     }
   };
   const handleNav = () => onBack && onBack();
-  const handleForgotPasswordClick = () => setShowForgotPassword(true);
-  const handleForgotPasswordBack = () => setShowForgotPassword(false);
 
   return (
     <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: '#f5f6fa', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -204,12 +201,10 @@ function LoginRegisterPage({
       </AppBar>
       <Box sx={{ mt: 8, width: 400, maxWidth: '90vw' }}>
         <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-          {!showForgotPassword ? (
-            <>
-              <Tabs value={tab} onChange={handleTabChange} variant="fullWidth" sx={{ mb: 3 }}>
-                <Tab label="Iniciar sesión" />
-                <Tab label="Registrarme" />
-              </Tabs>
+          <Tabs value={tab} onChange={handleTabChange} variant="fullWidth" sx={{ mb: 3 }}>
+            <Tab label="Iniciar sesión" />
+            <Tab label="Registrarme" />
+          </Tabs>
               {tab === 0 && (
                 <form onSubmit={handleLogin}>
                   {error && (
@@ -259,13 +254,6 @@ function LoginRegisterPage({
                       <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
                         {loading ? 'Iniciando sesión...' : 'Acceder'}
                       </Button>
-                    </Grid>
-                    <Grid item>
-                      <Box sx={{ textAlign: 'right' }}>
-                        <Button color="primary" sx={{ textTransform: 'none', fontSize: 14 }} onClick={handleForgotPasswordClick} disabled={loading}>
-                          ¿Has perdido tu contraseña?
-                        </Button>
-                      </Box>
                     </Grid>
                   </Grid>
                 </form>
@@ -351,24 +339,6 @@ function LoginRegisterPage({
                   </Grid>
                 </form>
               )}
-            </>
-          ) : (
-            <Box>
-              <Typography variant="h6" sx={{ mb: 2 }}>Recuperar contraseña</Typography>
-              <Typography sx={{ mb: 2 }}>
-                Ingresa tu correo electrónico y te enviaremos instrucciones para recuperar tu contraseña.
-              </Typography>
-              <form onSubmit={e => { e.preventDefault(); alert('Instrucciones enviadas (simulado)'); setShowForgotPassword(false); }}>
-                <TextField label="Correo electrónico" name="forgotEmail" type="email" fullWidth required sx={{ mb: 2 }} />
-                <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mb: 1 }}>
-                  Enviar instrucciones
-                </Button>
-                <Button variant="text" color="primary" fullWidth onClick={handleForgotPasswordBack}>
-                  Volver
-                </Button>
-              </form>
-            </Box>
-          )}
         </Paper>
       </Box>
 
