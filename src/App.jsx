@@ -9,9 +9,9 @@ import ProductManagement from './ProductManagement';
 import ContactForm from './ContactForm';
 import MessagesManagement from './MessagesManagement';
 import {
-  AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress
+  AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, InputAdornment
 } from '@mui/material';
-import { ShoppingCart, Menu as MenuIcon, ExitToApp, Add, Remove, Person, KeyboardArrowDown, Inventory, Email } from '@mui/icons-material';
+import { ShoppingCart, Menu as MenuIcon, ExitToApp, Add, Remove, Person, KeyboardArrowDown, Inventory, Email, Visibility, VisibilityOff } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 
 // Estilos personalizados para el buscador
@@ -77,6 +77,9 @@ function App() {
     newPassword: '',
     confirmPassword: ''
   });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Categorías disponibles para el menú de libros
   const categories = [
@@ -235,6 +238,10 @@ function App() {
   const handleProfileClose = () => {
     setProfileDialogOpen(false);
     setShowPasswordFields(false);
+    // Resetear visibilidad de contraseñas
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
     // Limpiar campos de contraseña al cerrar
     setProfileData(prev => ({
       ...prev,
@@ -250,6 +257,10 @@ function App() {
       [e.target.name]: e.target.value
     });
   };
+
+  const handleToggleCurrentPasswordVisibility = () => setShowCurrentPassword(!showCurrentPassword);
+  const handleToggleNewPasswordVisibility = () => setShowNewPassword(!showNewPassword);
+  const handleToggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   const handleProfileSave = async () => {
     try {
@@ -1153,6 +1164,10 @@ function App() {
                     onClick={() => {
                       setShowPasswordFields(!showPasswordFields);
                       if (showPasswordFields) {
+                        // Resetear visibilidad de contraseñas al ocultar
+                        setShowCurrentPassword(false);
+                        setShowNewPassword(false);
+                        setShowConfirmPassword(false);
                         // Limpiar campos de contraseña al ocultar
                         setProfileData(prev => ({
                           ...prev,
@@ -1173,31 +1188,57 @@ function App() {
                     <TextField
                       label="Contraseña actual"
                       name="currentPassword"
-                      type="password"
+                      type={showCurrentPassword ? "text" : "password"}
                       value={profileData.currentPassword}
                       onChange={handleProfileDataChange}
                       fullWidth
                       required
                       helperText="Ingrese su contraseña actual para confirmar el cambio"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleToggleCurrentPasswordVisibility}
+                              edge="end"
+                            >
+                              {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
                       label="Nueva contraseña"
                       name="newPassword"
-                      type="password"
+                      type={showNewPassword ? "text" : "password"}
                       value={profileData.newPassword}
                       onChange={handleProfileDataChange}
                       fullWidth
                       required
                       helperText="Mínimo 6 caracteres"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleToggleNewPasswordVisibility}
+                              edge="end"
+                            >
+                              {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
                       label="Confirmar nueva contraseña"
                       name="confirmPassword"
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       value={profileData.confirmPassword}
                       onChange={handleProfileDataChange}
                       fullWidth
@@ -1208,6 +1249,19 @@ function App() {
                           ? "Las contraseñas no coinciden"
                           : "Repita la nueva contraseña"
                       }
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleToggleConfirmPasswordVisibility}
+                              edge="end"
+                            >
+                              {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
                   </Grid>
                 </>
