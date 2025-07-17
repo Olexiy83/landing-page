@@ -818,24 +818,6 @@ function ContactForm({ onBack, cart = [], cartOpen = false, setCartOpen = () => 
                           Enviar mensaje
                         </Button>
                       </Box>
-                      
-                      <Box sx={{ textAlign: 'center', mt: 3 }}>
-                        <Button 
-                          variant="outlined" 
-                          size="small"
-                          onClick={() => {
-                            const subject = encodeURIComponent('Consulta desde la página web');
-                            const body = encodeURIComponent('Hola,\n\nMe contacto desde la página web de la librería.\n\nSaludos.');
-                            window.open(`mailto:olexiygrytsenko@gmail.com?subject=${subject}&body=${body}`);
-                          }}
-                          sx={{ 
-                            textTransform: 'none',
-                            fontSize: '0.9rem'
-                          }}
-                        >
-                          📧 Enviar email directo
-                        </Button>
-                      </Box>
                     </Grid>
                   </Grid>
                 </form>
