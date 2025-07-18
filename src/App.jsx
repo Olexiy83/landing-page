@@ -9,7 +9,7 @@ import ProductManagement from './ProductManagement';
 import ContactForm from './ContactForm';
 import MessagesManagement from './MessagesManagement';
 import {
-  AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, InputAdornment
+  AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Drawer, List, ListItem, ListItemText, Box, Button, Grid, Card, CardMedia, CardContent, CardActions, Select, MenuItem, Divider, Paper, TextField, Snackbar, Alert, Menu, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, InputAdornment, TablePagination
 } from '@mui/material';
 import { ShoppingCart, Menu as MenuIcon, ExitToApp, Add, Remove, Person, KeyboardArrowDown, Inventory, Email, Visibility, VisibilityOff } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
@@ -80,6 +80,10 @@ function App() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Estados para paginación de productos
+  const [productPage, setProductPage] = useState(0);
+  const [productsPerPage, setProductsPerPage] = useState(20);
 
   // Categorías disponibles para el menú de libros
   const categories = [
@@ -386,6 +390,16 @@ function App() {
     setSnackbarOpen(true);
   };
 
+  // Funciones para paginación de productos
+  const handleProductPageChange = (event, newPage) => {
+    setProductPage(newPage);
+  };
+
+  const handleProductsPerPageChange = (event) => {
+    setProductsPerPage(parseInt(event.target.value, 10));
+    setProductPage(0);
+  };
+
   let filteredProducts = products.filter((p) => {
     const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = selectedCategory === '' || p.category === selectedCategory;
@@ -400,6 +414,12 @@ function App() {
   } else if (sortOption === 'precio') {
     filteredProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
   }
+
+  // Calcular productos para la página actual
+  const paginatedProducts = filteredProducts.slice(
+    productPage * productsPerPage, 
+    productPage * productsPerPage + productsPerPage
+  );
 
   if (showLogin) {
     return (
@@ -674,20 +694,6 @@ function App() {
             gap: 2,
             mb: 3
           }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
-              {filteredProducts.length > 0 && (
-                <Typography variant="body2" sx={{ 
-                  color: 'text.secondary',
-                  backgroundColor: '#f5f5f5',
-                  px: 2,
-                  py: 0.5,
-                  borderRadius: 2,
-                  fontWeight: 500
-                }}>
-                  {filteredProducts.length} {filteredProducts.length === 1 ? 'libro' : 'libros'}
-                </Typography>
-              )}
-            </Box>
             <Select
               value={sortOption}
               onChange={e => setSortOption(e.target.value)}
@@ -798,7 +804,7 @@ function App() {
                 🔄 Reintentar
               </Button>
             </Box>
-          ) : filteredProducts.length === 0 ? (
+                      ) : filteredProducts.length === 0 ? (
             <Box sx={{ 
               width: '100%',
               display: 'flex', 
@@ -816,7 +822,7 @@ function App() {
               </Typography>
             </Box>
           ) : (
-            filteredProducts.map((book) => (
+            paginatedProducts.map((book) => (
               <Card 
                 key={book.id} 
                 sx={{ 
@@ -940,6 +946,51 @@ function App() {
             ))
           )}
         </Box>
+        
+        {/* Paginación de productos */}
+        {filteredProducts.length > 0 && (
+          <Paper elevation={0} sx={{ 
+            mt: 4, 
+            mb: 2,
+            bgcolor: 'white',
+            borderRadius: 3,
+            maxWidth: 800,
+            mx: 'auto',
+            overflow: 'hidden'
+          }}>
+            <TablePagination
+              component="div"
+              count={filteredProducts.length}
+              page={productPage}
+              onPageChange={handleProductPageChange}
+              rowsPerPage={productsPerPage}
+              onRowsPerPageChange={handleProductsPerPageChange}
+              rowsPerPageOptions={[20, 40, 60]}
+              labelRowsPerPage="Productos por página:"
+              labelDisplayedRows={({ from, to, count }) => 
+                `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
+              }
+              sx={{
+                '& .MuiTablePagination-toolbar': {
+                  px: 2,
+                  py: 1,
+                  flexWrap: 'wrap',
+                  gap: 1
+                },
+                '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                  fontSize: '0.875rem',
+                  color: 'text.secondary'
+                },
+                '& .MuiTablePagination-select': {
+                  fontSize: '0.875rem'
+                },
+                '& .MuiTablePagination-actions': {
+                  flexShrink: 0
+                }
+              }}
+            />
+          </Paper>
+        )}
       </Box>
 
 

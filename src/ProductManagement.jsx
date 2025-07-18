@@ -24,7 +24,8 @@ import {
   Toolbar,
   Chip,
   Tooltip,
-  Fab
+  Fab,
+  TablePagination
 } from '@mui/material';
 import {
   Edit,
@@ -47,6 +48,10 @@ function ProductManagement({ onBack, user }) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  
+  // Estados para paginación
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
   
   const [productForm, setProductForm] = useState({
     title: '',
@@ -150,6 +155,19 @@ function ProductManagement({ onBack, user }) {
     setSelectedProduct(product);
     setDeleteDialogOpen(true);
   };
+
+  // Funciones para paginación
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  // Calcular productos para la página actual
+  const paginatedProducts = products.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -340,7 +358,7 @@ function ProductManagement({ onBack, user }) {
         <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Typography variant="h5" sx={{ fontWeight: 600, color: '#333' }}>
-              Lista de Productos ({products.length})
+              Lista de Productos ({products.length} total)
             </Typography>
             <Button
               variant="contained"
@@ -356,7 +374,7 @@ function ProductManagement({ onBack, user }) {
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
-                  <TableCell sx={{ fontWeight: 600 }}>ID</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>#</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Imagen</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Título</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Autor</TableCell>
@@ -366,9 +384,9 @@ function ProductManagement({ onBack, user }) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {products.map((product) => (
+                {paginatedProducts.map((product, index) => (
                   <TableRow key={product.id} hover>
-                    <TableCell>{product.id}</TableCell>
+                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         {product.image ? (
@@ -435,6 +453,25 @@ function ProductManagement({ onBack, user }) {
               </TableBody>
             </Table>
           </TableContainer>
+          
+          {/* Paginación */}
+          <TablePagination
+            component="div"
+            count={products.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[20, 50, 100]}
+            labelRowsPerPage="Productos por página:"
+            labelDisplayedRows={({ from, to, count }) => 
+              `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
+            }
+            sx={{
+              borderTop: '1px solid #e0e0e0',
+              mt: 1
+            }}
+          />
         </Paper>
       </Box>
 
