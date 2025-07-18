@@ -23,7 +23,8 @@ import {
   AppBar,
   Toolbar,
   Chip,
-  Tooltip
+  Tooltip,
+  TablePagination
 } from '@mui/material';
 import {
   Edit,
@@ -46,6 +47,10 @@ function UserManagement({ onBack, user }) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  
+  // Estados para paginación
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
   
   const [editForm, setEditForm] = useState({
     name: '',
@@ -170,6 +175,19 @@ function UserManagement({ onBack, user }) {
     return userToCheck.email === 'admin' || userToCheck.isAdmin;
   };
 
+  // Funciones para paginación
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  // Calcular usuarios para la página actual
+  const paginatedUsers = users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
@@ -234,7 +252,7 @@ function UserManagement({ onBack, user }) {
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
-                  <TableCell sx={{ fontWeight: 600 }}>ID</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>#</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Nombre</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Documento</TableCell>
@@ -244,9 +262,9 @@ function UserManagement({ onBack, user }) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((userRow) => (
+                {paginatedUsers.map((userRow, index) => (
                   <TableRow key={userRow.id} hover>
-                    <TableCell>{userRow.id}</TableCell>
+                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Person sx={{ mr: 1, color: '#666' }} />
@@ -315,6 +333,32 @@ function UserManagement({ onBack, user }) {
               </TableBody>
             </Table>
           </TableContainer>
+          
+          {/* Paginación */}
+          <TablePagination
+            component="div"
+            count={users.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[20, 40, 60]}
+            labelRowsPerPage="Usuarios por página:"
+            labelDisplayedRows={({ from, to, count }) => 
+              `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
+            }
+            sx={{
+              borderTop: '1px solid #e0e0e0',
+              '& .MuiTablePagination-toolbar': {
+                px: 2,
+                py: 1
+              },
+              '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                fontSize: '0.875rem',
+                color: 'text.secondary'
+              }
+            }}
+          />
         </Paper>
       </Box>
 

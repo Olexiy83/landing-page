@@ -18,7 +18,8 @@ import {
   Button,
   Divider,
   Alert,
-  Grid
+  Grid,
+  TablePagination
 } from '@mui/material';
 import { ArrowBack, Email, Delete, Visibility, Person, Phone, Message, Refresh, Edit } from '@mui/icons-material';
 
@@ -27,6 +28,10 @@ function MessagesManagement({ onBack, user }) {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Estados para paginación
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -146,6 +151,19 @@ function MessagesManagement({ onBack, user }) {
     }
   };
 
+  // Funciones para paginación
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  // Calcular mensajes para la página actual
+  const paginatedMessages = messages.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
   return (
     <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: '#f5f6fa', p: 3 }}>
       {/* Header */}
@@ -197,22 +215,23 @@ function MessagesManagement({ onBack, user }) {
             No hay mensajes de contacto para mostrar.
           </Alert>
         ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ bgcolor: '#f8f9fa' }}>
-                  <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>ID</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Nombre</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Email</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Teléfono</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Asunto</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Estado</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Fecha</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Acciones</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {messages.map((message) => (
+          <>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ bgcolor: '#f8f9fa' }}>
+                    <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>#</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Nombre</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Email</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Teléfono</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Asunto</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Estado</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Fecha</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#2c3e50' }}>Acciones</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedMessages.map((message, index) => (
                   <TableRow 
                     key={message.id}
                     sx={{ 
@@ -220,7 +239,7 @@ function MessagesManagement({ onBack, user }) {
                       '&:nth-of-type(even)': { bgcolor: '#fafafa' }
                     }}
                   >
-                    <TableCell sx={{ fontWeight: 600 }}>{message.id}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{page * rowsPerPage + index + 1}</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Person sx={{ mr: 1, color: '#666', fontSize: '1.2rem' }} />
@@ -306,13 +325,38 @@ function MessagesManagement({ onBack, user }) {
                     </TableCell>
                   </TableRow>
                 ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableBody>
+              </Table>
+            </TableContainer>
+            
+            {/* Paginación */}
+            <TablePagination
+              component="div"
+              count={messages.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[20, 40, 60]}
+              labelRowsPerPage="Mensajes por página:"
+              labelDisplayedRows={({ from, to, count }) => 
+                `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
+              }
+              sx={{
+                borderTop: '1px solid #e0e0e0',
+                '& .MuiTablePagination-toolbar': {
+                  px: 2,
+                  py: 1
+                },
+                '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                  fontSize: '0.875rem',
+                  color: 'text.secondary'
+                }
+              }}
+            />
+          </>
         )}
-      </Paper>
-
-      {/* Message Detail Dialog */}
+      </Paper>      {/* Message Detail Dialog */}
       <Dialog 
         open={dialogOpen} 
         onClose={handleCloseDialog}
